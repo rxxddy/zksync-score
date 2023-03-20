@@ -187,7 +187,7 @@ useEffect(() => {
   }
 
   let txCount = transactionCount;
-  let txScore
+  let txScore = 0;
 
   if (txCount <= 1) {
     txScore = 0;
