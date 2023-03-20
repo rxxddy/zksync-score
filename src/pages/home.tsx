@@ -18,6 +18,8 @@ const Home: NextPage = () => {
   const [ensName, setENSName] = useState<string | null>(null);
   const [firstTxDate, setFirstTxDate] = useState<string>("");
   const [walletAge, setWalletAge] = useState<number | null>(null);
+  const [erc20Count, setErc20Count] = useState<number | null>(null);
+
 
   useEffect(() => {
     const getTransactionCount = async () => {
@@ -98,18 +100,20 @@ useEffect(() => {
           const now = new Date();
           const diffTime = Math.abs(now.getTime() - firstTxDate.getTime());
           const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
-          if (diffMonths <= 3) {
-            setWalletAge(1);
-          } else if (diffMonths <= 6) {
-            setWalletAge(2);
-          } else if (diffMonths <= 12) {
-            setWalletAge(3);
-          } else if (diffMonths <= 24) {
-            setWalletAge(4);
-          } else if (diffMonths <= 36) {
+          if (diffMonths <= 1) {
+            setWalletAge(0);
+          } else if (diffMonths <= 3) {
             setWalletAge(5);
+          } else if (diffMonths <= 6) {
+            setWalletAge(10);
+          } else if (diffMonths <= 12) {
+            setWalletAge(15);
+          } else if (diffMonths <= 24) {
+            setWalletAge(20);
+          } else if (diffMonths <= 36) {
+            setWalletAge(25);
           } else {
-            setWalletAge(6);
+            setWalletAge(30);
           }
         } else {
           setWalletAge(null);
@@ -125,6 +129,31 @@ useEffect(() => {
 
 
 
+useEffect(() => {
+  const getErc20Count = async () => {
+    if (address) {
+      try {
+        const response = await axios.get(`https://api.bscscan.com/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken`);
+        const erc20Transactions = response.data.result;
+        const uniqueTokenAddresses = new Set<string>();
+
+        erc20Transactions.forEach((tx: any) => {
+          uniqueTokenAddresses.add(tx.contractAddress);
+        });
+
+        setErc20Count(uniqueTokenAddresses.size);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  getErc20Count();
+}, [address]);
+
+
+
+
   function handleButtonClick() {
     window.location.href = '/';
   }
@@ -133,16 +162,69 @@ useEffect(() => {
     console.log(walletAge)
   }
 
-  let Score1 = transactionCount;
-  let Score
+  let txCount = transactionCount;
+  let txScore
 
-  if (Score1 <= 1) {
-    Score = 1;
-  } else if (Score1 >= 10) {
-    Score = 10;
+  if (txCount <= 1) {
+    txScore = 0;
+  } else if (txCount <= 10) {
+    txScore = 1;
+  } else if (txCount <= 100) {
+    txScore = 5;
+  } else if (txCount <= 500) {
+    txScore = 10;
+  } else if (txCount <= 1000) {
+    txScore = 15;
   } else {
-    Score = Score1;
+    txScore = 15;
   }
+
+  let ensCount = ensName;
+  let ensScore
+
+  if (ensCount == null) {
+    ensScore = 0;
+  } else {
+    ensScore = 5;
+  }
+
+
+  let tokensCount = erc20Count;
+  let tokensScore
+
+  if (tokensCount <= 5) {
+    tokensScore = 1;
+  } else if (tokensCount <= 10) {
+    tokensScore = 10;
+  } else if (tokensCount <= 50) {
+    tokensScore = 15;
+  } else if (tokensCount <= 100) {
+    tokensScore = 20;
+  } else {
+    tokensScore = 25;
+  }
+
+  let balanceCount = balance;
+  let balanceScore
+
+  if (balanceCount <= 0) {
+    balanceScore = 0;
+  } else if (balanceCount <= 0.1) {
+    balanceScore = 1;
+  } else if (balanceCount <= 0.5) {
+    balanceScore = 5;
+  } else if (balanceCount <= 1) {
+    balanceScore = 10;
+  } else if (balanceCount <= 10) {
+    balanceScore = 15;
+  } else if (balanceCount <= 100) {
+    balanceScore = 20;
+  } else {
+    balanceScore = 25;
+  }
+
+
+  let Score = tokensScore + txScore + walletAge + ensScore + balanceScore
 
 
 
@@ -195,7 +277,7 @@ useEffect(() => {
             <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>ENS Name: <div className='text-white py-2 text-2xl font-sans font-medium'>{ensName ? ensName : "none"}</div></div></div>
             <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Your Score: <div className='text-white py-2 text-2xl font-sans font-medium'>{Score}</div></div></div>
             <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Wallet Created: <div className='text-white py-2 text-2xl font-sans font-medium'>{firstTxDate}</div></div></div>
-            <div className=" bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Transaction Count: <div className='text-white py-2 text-2xl font-sans font-medium'>{transactionCount}</div></div></div>
+            <div className=" bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Number of Tokens: <div className='text-white py-2 text-2xl font-sans font-medium'>{erc20Count}</div></div></div>
             <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Address: <div className='text-white py-2 text-2xl font-sans font-medium'>{address}</div></div></div>
           </div>
         </div>
