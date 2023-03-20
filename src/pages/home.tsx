@@ -213,7 +213,7 @@ useEffect(() => {
   }
 
 
-  let tokensCount = erc20Count;
+  let tokensCount = erc20Count ?? 0; // Use 0 as the default value if erc20Count is null or undefined
   let tokensScore = 0;
 
   if (tokensCount <= 5) {
@@ -228,9 +228,9 @@ useEffect(() => {
     tokensScore = 25;
   }
 
-  let balanceCount = balance;
+  let balanceCount = parseFloat(balance);
   let balanceScore = 0;
-
+  
   if (balanceCount <= 0) {
     balanceScore = 0;
   } else if (balanceCount <= 0.1) {
@@ -247,8 +247,9 @@ useEffect(() => {
     balanceScore = 25;
   }
 
+  let walletCount = walletAge || 0;
 
-  let Score = tokensScore + txScore + walletAge + ensScore + balanceScore
+  let Score = tokensScore + txScore + walletCount + ensScore + balanceScore
 
 
   function getConsoleInfo() {
