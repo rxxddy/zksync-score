@@ -62,27 +62,51 @@ const Home: NextPage = () => {
   }, [address]);
 
 //
-  useEffect(() => {
-    const getFirstTxDate = async () => {
-      if (address) {
-        try {
-          const response = await axios.get(`https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
-          const transactions = response.data.result;
-          if (transactions.length > 0) {
-            const firstTxTimestamp = parseInt(transactions[0].timeStamp);
-            const date = new Date(firstTxTimestamp * 1000);
-            const options = { day: "numeric", month: "long", year: "numeric" };
-            setFirstTxDate(date.toLocaleDateString("en-US", options));
-          } else {
-            setFirstTxDate("No transactions found");
-          }
-        } catch (error) {
-          console.log(error);
+  // useEffect(() => {
+  //   const getFirstTxDate = async () => {
+  //     if (address) {
+  //       try {
+  //         const response = await axios.get(`https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
+  //         const transactions = response.data.result;
+  //         if (transactions.length > 0) {
+  //           const firstTxTimestamp = parseInt(transactions[0].timeStamp);
+  //           const date = new Date(firstTxTimestamp * 1000);
+  //           const options = { day: "numeric", month: "long", year: "numeric" };
+  //           setFirstTxDate(date.toLocaleDateString("en-US", options));
+  //         } else {
+  //           setFirstTxDate("No transactions found");
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   };
+  //   getFirstTxDate();
+  // }, [address]);
+//
+
+//
+useEffect(() => {
+  const getFirstTxDate = async () => {
+    if (address) {
+      try {
+        const response = await axios.get(`https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
+        const transactions = response.data.result;
+        if (transactions.length > 0) {
+          const firstTxTimestamp = parseInt(transactions[0].timeStamp);
+          const date = new Date(firstTxTimestamp * 1000);
+          const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
+          setFirstTxDate(date.toLocaleDateString("en-US", options));
+        } else {
+          setFirstTxDate("No transactions found");
         }
+      } catch (error) {
+        console.log(error);
       }
-    };
-    getFirstTxDate();
-  }, [address]);
+    }
+  };
+  getFirstTxDate();
+}, [address]);
 //
 
 
@@ -180,7 +204,7 @@ useEffect(() => {
   }
 
   let ensCount = ensName;
-  let ensScore
+  let ensScore = 0;
 
   if (ensCount == null) {
     ensScore = 0;
@@ -190,7 +214,7 @@ useEffect(() => {
 
 
   let tokensCount = erc20Count;
-  let tokensScore
+  let tokensScore = 0;
 
   if (tokensCount <= 5) {
     tokensScore = 1;
@@ -205,7 +229,7 @@ useEffect(() => {
   }
 
   let balanceCount = balance;
-  let balanceScore
+  let balanceScore = 0;
 
   if (balanceCount <= 0) {
     balanceScore = 0;
