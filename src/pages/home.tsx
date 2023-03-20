@@ -116,7 +116,7 @@ useEffect(() => {
             setWalletAge(30);
           }
         } else {
-          setWalletAge(null);
+          setWalletAge(30);
         }
       } catch (error) {
         console.log(error);
