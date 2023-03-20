@@ -227,7 +227,18 @@ useEffect(() => {
   let Score = tokensScore + txScore + walletAge + ensScore + balanceScore
 
 
-
+  function getConsoleInfo() {
+    console.log("tokensScore");
+    console.log(tokensScore);
+    console.log("txScore");
+    console.log(txScore);
+    console.log("walletAge");
+    console.log(walletAge);
+    console.log("ensScore");
+    console.log(ensScore);
+    console.log("balanceScore");
+    console.log(balanceScore);
+  }
 
   return (
     <div>
@@ -256,8 +267,8 @@ useEffect(() => {
                     <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
                         About
                     </button>
-                    <button onClick={month} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Montn
+                    <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                        Get Wallet Info in console
                     </button>
                 </ul>
                 </nav>
