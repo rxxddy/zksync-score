@@ -10,6 +10,7 @@ import { useBalance } from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
 import axios from "axios";
 
+import { PieChart } from 'react-minimal-pie-chart';
 
 const Home: NextPage = () => {
   const address = useAddress()
@@ -242,6 +243,58 @@ function handleButtonClick() {
     console.log(balanceScore);
   }
 
+
+  
+
+  const options2 = {
+    value: Score / 100,
+    label: 'NPS',
+    showMinMax: false,
+    gaugeColor: '#ddd',
+    levelColors: ['#d9534f', '#f0ad4e', '#5cb85c'],
+    customSectors: [
+      {
+        color: '#d9534f',
+        lo: -1,
+        hi: -0.1,
+      },
+      {
+        color: '#f0ad4e',
+        lo: -0.1,
+        hi: 0.1,
+      },
+      {
+        color: '#5cb85c',
+        lo: 0.1,
+        hi: 1,
+      },
+    ],
+    style: { width: '200px', height: '200px', margin: 'auto' },
+  };
+
+  const data = [{ value: Score, color: getColor(Score) }];
+  const totalValue = 100;
+
+
+
+  function getColor(Score: number) {
+    if (Score >= 0 && Score <= 20) {
+      return "#FF0000"; // red
+    } else if (Score > 20 && Score <= 40) {
+      return "#FFA500"; // orange
+    } else if (Score > 40 && Score <= 60) {
+      return "#ffe043"; // yellow
+    } else if (Score > 60 && Score <= 80) {
+      return "#90EE90"; // light green
+    } else if (Score > 80 && Score <= 90) {
+      return "#008000"; // green
+    } else if (Score > 90 && Score <= 100) {
+      return "#800080"; // purple
+    } else {
+      return "#000000"; // black
+    }
+  }
+
   return (
     <div>
         <nav className="bg-[#000000]">
@@ -255,23 +308,23 @@ function handleButtonClick() {
                       width={`30vh`}
                       height={`30vh`}
                     />
-                    <h1 className='text-[3vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
+                    <h1 className='text-[2vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
                 </button>
                 <nav className="contents font-semibold text-base lg:text-lg">
                 <ul className="mx-auto flex items-center">
                     
-                    <div className="p-5 xl:p-8 text-[#c1c1c1] active">
+                    <div className=" p-5 xl:p-8 text-[#c1c1c1] active">
                         Home
                     </div>
                     <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
                         Mint
                     </button>
-                    <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                    {/* <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
                         About
                     </button>
                     <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
                         Get Wallet Info in console
-                    </button>
+                    </button> */}
                 </ul>
                 </nav>
                 
@@ -283,7 +336,7 @@ function handleButtonClick() {
                 
             </div>
         </nav>
-        <div className='w-[90vh] m-auto mt-[8%] p-10'>
+        <div className='w-[90%] max-w-screen-2xl m-auto mt-[8%] p-10 hidden sm:block'>
           <div className="grid grid-cols-3 gap-8 m-auto">
             <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Transaction Count: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{transactionCount}</div></div></div>
             <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Your Balance: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{balance}</div></div></div>
@@ -293,6 +346,21 @@ function handleButtonClick() {
             <div className=" bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Number of Tokens: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{erc20Count}</div></div></div>
             <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Address: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{address}</div></div></div>
           </div>
+        </div>
+        <div className='w-[50vh] m-auto mt-[8%] p-10 block sm:hidden'>
+          <PieChart
+            data={data}
+            totalValue={200}
+            lineWidth={20}
+            label={({ dataEntry }) => dataEntry.value}
+            labelStyle={{
+              fontSize: '25px',
+              fontFamily: 'sans-serif',
+              fill: 'white',
+            }}
+            labelPosition={0}
+            startAngle={180}
+          />
         </div>
     </div>
   )
