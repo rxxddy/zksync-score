@@ -1,301 +1,403 @@
-import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+// import { Inter } from 'next/font/google'
+import styles from '@/styles/Theme.module.css'
+
 import { ConnectWallet } from "@thirdweb-dev/react";
 import { Link } from "react-router-dom";
-import { ethers, providers } from "ethers";
-import { useEffect, useState } from 'react';
-import { useAddress } from "@thirdweb-dev/react"
-import { useBalance } from "@thirdweb-dev/react";
-import { NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
-import axios from "axios";
 
+import {
+  useActiveClaimConditionForWallet,
+  useAddress,
+  useClaimConditions,
+  useClaimerProofs,
+  useClaimIneligibilityReasons,
+  useContract,
+  useContractMetadata,
+  useTotalCirculatingSupply,
+  Web3Button,
+} from "@thirdweb-dev/react";
+import { BigNumber, utils } from "ethers";
+import type { NextPage } from "next";
+import { useMemo, useState } from "react";
+import { parseIneligibility } from "../utils/parseIneligibility";
+import Logo from "../../public/logo.png"
+import { BrowserRouter } from 'react-router-dom';
+
+
+// Put Your Edition Drop Contract address from the dashboard here
+const myEditionDropContractAddress =
+  "0x9502DbD5264D26dF4A75B68E98026219e107143b";
+
+// Put your token ID here
+const tokenId = 0;
 
 const Home: NextPage = () => {
-  const address = useAddress()
-  const [transactionCount, setTransactionCount] = useState<number>(0);
-  const [balance, setBalance] = useState<string>("0");
-  const [ensName, setENSName] = useState<string | null>(null);
-  const [firstTxDate, setFirstTxDate] = useState<string>("");
-  const [walletAge, setWalletAge] = useState<number | null>(null);
-  const [erc20Count, setErc20Count] = useState<number | null>(null);
+  const address = useAddress();
+  const [quantity, setQuantity] = useState(1);
+  const { contract: editionDrop } = useContract(myEditionDropContractAddress);
+  const { data: contractMetadata } = useContractMetadata(editionDrop);
 
+  const claimConditions = useClaimConditions(editionDrop);
+  const activeClaimCondition = useActiveClaimConditionForWallet(
+    editionDrop,
+    address,
+    tokenId
+  );
+  const claimerProofs = useClaimerProofs(editionDrop, address || "", tokenId);
+  const claimIneligibilityReasons = useClaimIneligibilityReasons(
+    editionDrop,
+    {
+      quantity,
+      walletAddress: address || "",
+    },
+    tokenId
+  );
 
-  useEffect(() => {
-    const getTransactionCount = async () => {
-      if (address) {
-        // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/bsc/testnet/public");
-        const count = await provider.getTransactionCount(address);
-        setTransactionCount(count);
-      }
-    };
-    getTransactionCount();
-  }, [address]);
+  const claimedSupply = useTotalCirculatingSupply(editionDrop, tokenId);
 
-  useEffect(() => {
-    const getBalance = async () => {
-      if (address) {
-        // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/bsc/testnet/public");
-        const balance = await provider.getBalance(address);
-        const formattedBalance = parseFloat(ethers.utils.formatEther(balance)).toFixed(3);
-        setBalance(formattedBalance);
-      }
-    };
-    getBalance();
-  }, [address]);
+  const totalAvailableSupply = useMemo(() => {
+    try {
+      return BigNumber.from(activeClaimCondition.data?.availableSupply || 0);
+    } catch {
+      return BigNumber.from(1_000_000);
+    }
+  }, [activeClaimCondition.data?.availableSupply]);
 
-  
+  const numberClaimed = useMemo(() => {
+    return BigNumber.from(claimedSupply.data || 0).toString();
+  }, [claimedSupply]);
 
+  const numberTotal = useMemo(() => {
+    const n = totalAvailableSupply.add(BigNumber.from(claimedSupply.data || 0));
+    if (n.gte(1_000_000)) {
+      return "";
+    }
+    return n.toString();
+  }, [totalAvailableSupply, claimedSupply]);
 
-  useEffect(() => {
-    const getENSName = async () => {
-      if (address) {
-        // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/eth/mainnet/public");
-        const name = await provider.lookupAddress(address);
-        setENSName(name);
-      }
-    };
-    getENSName();
-  }, [address]);
+  const priceToMint = useMemo(() => {
+    const bnPrice = BigNumber.from(
+      activeClaimCondition.data?.currencyMetadata.value || 0
+    );
+    return `${utils.formatUnits(
+      bnPrice.mul(quantity).toString(),
+      activeClaimCondition.data?.currencyMetadata.decimals || 18
+    )} ${activeClaimCondition.data?.currencyMetadata.symbol}`;
+  }, [
+    activeClaimCondition.data?.currencyMetadata.decimals,
+    activeClaimCondition.data?.currencyMetadata.symbol,
+    activeClaimCondition.data?.currencyMetadata.value,
+    quantity,
+  ]);
 
+  const maxClaimable = useMemo(() => {
+    let bnMaxClaimable;
+    try {
+      bnMaxClaimable = BigNumber.from(
+        activeClaimCondition.data?.maxClaimableSupply || 0
+      );
+    } catch (e) {
+      bnMaxClaimable = BigNumber.from(1_000_000);
+    }
 
-//
-useEffect(() => {
-  const getFirstTxDate = async () => {
-    if (address) {
-      try {
-        const response = await axios.get(`https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
-        const transactions = response.data.result;
-        if (transactions.length > 0) {
-          const firstTxTimestamp = parseInt(transactions[0].timeStamp);
-          const date = new Date(firstTxTimestamp * 1000);
-          const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
-          setFirstTxDate(date.toLocaleDateString("en-US", options));
-        } else {
-          setFirstTxDate("No transactions found");
+    let perTransactionClaimable;
+    try {
+      perTransactionClaimable = BigNumber.from(
+        activeClaimCondition.data?.maxClaimablePerWallet || 0
+      );
+    } catch (e) {
+      perTransactionClaimable = BigNumber.from(1_000_000);
+    }
+
+    if (perTransactionClaimable.lte(bnMaxClaimable)) {
+      bnMaxClaimable = perTransactionClaimable;
+    }
+
+    const snapshotClaimable = claimerProofs.data?.maxClaimable;
+
+    if (snapshotClaimable) {
+      if (snapshotClaimable === "0") {
+        // allowed unlimited for the snapshot
+        bnMaxClaimable = BigNumber.from(1_000_000);
+      } else {
+        try {
+          bnMaxClaimable = BigNumber.from(snapshotClaimable);
+        } catch (e) {
+          // fall back to default case
         }
-      } catch (error) {
-        console.log(error);
       }
     }
-  };
-  getFirstTxDate();
-}, [address]);
-//
 
-
-
-
-useEffect(() => {
-  const getFirstTxDate2 = async () => {
-    if (address) {
-      try {
-        const response = await axios.get(`https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
-        const transactions = response.data.result;
-        if (transactions.length > 0) {
-          const firstTxTimestamp = parseInt(transactions[0].timeStamp);
-          const firstTxDate = new Date(firstTxTimestamp * 1000);
-          const now = new Date();
-          const diffTime = Math.abs(now.getTime() - firstTxDate.getTime());
-          const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
-          if (diffMonths <= 1) {
-            setWalletAge(0);
-          } else if (diffMonths <= 3) {
-            setWalletAge(5);
-          } else if (diffMonths <= 6) {
-            setWalletAge(10);
-          } else if (diffMonths <= 12) {
-            setWalletAge(15);
-          } else if (diffMonths <= 24) {
-            setWalletAge(20);
-          } else if (diffMonths <= 36) {
-            setWalletAge(25);
-          } else {
-            setWalletAge(30);
-          }
-        } else {
-          setWalletAge(30);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+    let max;
+    if (totalAvailableSupply.lt(bnMaxClaimable)) {
+      max = totalAvailableSupply;
+    } else {
+      max = bnMaxClaimable;
     }
-  };
-  getFirstTxDate2();
-}, [address]);
 
-
-
-
-useEffect(() => {
-  const getErc20Count = async () => {
-    if (address) {
-      try {
-        const response = await axios.get(`https://api.bscscan.com/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken`);
-        const erc20Transactions = response.data.result;
-        const uniqueTokenAddresses = new Set<string>();
-
-        erc20Transactions.forEach((tx: any) => {
-          uniqueTokenAddresses.add(tx.contractAddress);
-        });
-
-        setErc20Count(uniqueTokenAddresses.size);
-      } catch (error) {
-        console.log(error);
-      }
+    if (max.gte(1_000_000)) {
+      return 1_000_000;
     }
-  };
+    return max.toNumber();
+  }, [
+    claimerProofs.data?.maxClaimable,
+    totalAvailableSupply,
+    activeClaimCondition.data?.maxClaimableSupply,
+    activeClaimCondition.data?.maxClaimablePerWallet,
+  ]);
 
-  getErc20Count();
-}, [address]);
+  const isSoldOut = useMemo(() => {
+    try {
+      return (
+        (activeClaimCondition.isSuccess &&
+          BigNumber.from(activeClaimCondition.data?.availableSupply || 0).lte(
+            0
+          )) ||
+        numberClaimed === numberTotal
+      );
+    } catch (e) {
+      return false;
+    }
+  }, [
+    activeClaimCondition.data?.availableSupply,
+    activeClaimCondition.isSuccess,
+    numberClaimed,
+    numberTotal,
+  ]);
+
+  const canClaim = useMemo(() => {
+    return (
+      activeClaimCondition.isSuccess &&
+      claimIneligibilityReasons.isSuccess &&
+      claimIneligibilityReasons.data?.length === 0
+    );
+  }, [activeClaimCondition.isSuccess, claimIneligibilityReasons.isSuccess, claimIneligibilityReasons.data?.length]);
+
+  const isLoading = useMemo(() => {
+    return (
+      activeClaimCondition.isLoading || claimedSupply.isLoading || !editionDrop
+    );
+  }, [activeClaimCondition.isLoading, editionDrop, claimedSupply.isLoading]);
+
+  const buttonLoading = useMemo(
+    () => isLoading || claimIneligibilityReasons.isLoading,
+    [claimIneligibilityReasons.isLoading, isLoading]
+  );
+  const buttonText = useMemo(() => {
+    if (isSoldOut) {
+      return "Sold Out";
+    }
+
+    if (canClaim) {
+      const pricePerToken = BigNumber.from(
+        activeClaimCondition.data?.currencyMetadata.value || 0
+      );
+      if (pricePerToken.eq(0)) {
+        return "Mint (1$ + gas)";
+      }
+      return `Mint (${priceToMint})`;
+    }
+    if (claimIneligibilityReasons.data?.length) {
+      return parseIneligibility(claimIneligibilityReasons.data, quantity);
+    }
+    if (buttonLoading) {
+      return "Checking eligibility...";
+    }
+
+    return "Claiming not available";
+  }, [
+    isSoldOut,
+    canClaim,
+    claimIneligibilityReasons.data,
+    buttonLoading,
+    activeClaimCondition.data?.currencyMetadata.value,
+    priceToMint,
+    quantity,
+  ]);
 
 
 
-
-function handleButtonClick() {
-  window.location.href = '/home';
-}
-
-  function month() {
-    console.log(walletAge)
+  function handleButtonClick() {
+    window.location.href = '/home';
   }
-
-  let txCount = transactionCount;
-  let txScore = 0;
-
-  if (txCount <= 1) {
-    txScore = 0;
-  } else if (txCount <= 10) {
-    txScore = 1;
-  } else if (txCount <= 100) {
-    txScore = 5;
-  } else if (txCount <= 500) {
-    txScore = 10;
-  } else if (txCount <= 1000) {
-    txScore = 15;
-  } else {
-    txScore = 15;
+  function zksyncTwitter() {
+    window.location.href = 'https://twitter.com/zksync';
   }
-
-  let ensCount = ensName;
-  let ensScore = 0;
-
-  if (ensCount == null) {
-    ensScore = 0;
-  } else {
-    ensScore = 5;
+  function zksyncWebsite() {
+    window.location.href = 'https://zksync.io/';
   }
-
-
-  let tokensCount = erc20Count ?? 0; // Use 0 as the default value if erc20Count is null or undefined
-  let tokensScore = 0;
-
-  if (tokensCount <= 5) {
-    tokensScore = 1;
-  } else if (tokensCount <= 10) {
-    tokensScore = 10;
-  } else if (tokensCount <= 50) {
-    tokensScore = 15;
-  } else if (tokensCount <= 100) {
-    tokensScore = 20;
-  } else {
-    tokensScore = 25;
-  }
-
-  let balanceCount = parseFloat(balance);
-  let balanceScore = 0;
-  
-  if (balanceCount <= 0) {
-    balanceScore = 0;
-  } else if (balanceCount <= 0.1) {
-    balanceScore = 1;
-  } else if (balanceCount <= 0.5) {
-    balanceScore = 5;
-  } else if (balanceCount <= 1) {
-    balanceScore = 10;
-  } else if (balanceCount <= 10) {
-    balanceScore = 15;
-  } else if (balanceCount <= 100) {
-    balanceScore = 20;
-  } else {
-    balanceScore = 25;
-  }
-
-  let walletCount = walletAge || 0;
-
-  let Score = tokensScore + txScore + walletCount + ensScore + balanceScore
-
-
-  function getConsoleInfo() {
-    console.log("tokensScore");
-    console.log(tokensScore);
-    console.log("txScore");
-    console.log(txScore);
-    console.log("walletAge");
-    console.log(walletAge);
-    console.log("ensScore");
-    console.log(ensScore);
-    console.log("balanceScore");
-    console.log(balanceScore);
+  function zksyncBridge() {
+    window.location.href = 'https://portal.zksync.io/bridge';
   }
 
   return (
     <div>
-        <nav className="bg-[#000000]">
-            <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl">
-                <button onClick={handleButtonClick} className="flex items-center justify-center">
-                    <div className="h-16" />
-                    {/* <span className="ml-4 uppercase font-black">clara<br/>thella</span> */}
-                    <Image
-                      src="/logo.png"
-                      alt="thirdweb Logo"
-                      width={60}
-                      height={60}
-                    />
-                    <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
-                </button>
-                <nav className="contents font-semibold text-base lg:text-lg">
-                <ul className="mx-auto flex items-center">
-                    
-                    <div className="p-5 xl:p-8 text-[#c1c1c1] active">
-                        Home
-                    </div>
-                    <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Mint
-                    </button>
-                    <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        About
-                    </button>
-                    <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Get Wallet Info in console
-                    </button>
-                </ul>
-                </nav>
-                
-                    <ConnectWallet 
-                        accentColor="#000000"
-                        colorMode="dark"
-                        btnTitle="Connect Wallet"
-                    />
-                
-            </div>
-        </nav>
-        <div className='w-[1800px] m-auto mt-[20vh]'>
-          <div className="grid grid-cols-3 gap-8 m-auto">
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Transaction Count: <div className='text-white py-2 text-2xl font-sans font-medium'>{transactionCount}</div></div></div>
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Your Balance: <div className='text-white py-2 text-2xl font-sans font-medium'>{balance}</div></div></div>
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>ENS Name: <div className='text-white py-2 text-2xl font-sans font-medium'>{ensName ? ensName : "none"}</div></div></div>
-            <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Your Score: <div className='text-white py-2 text-2xl font-sans font-medium'>{Score}</div></div></div>
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Wallet Created: <div className='text-white py-2 text-2xl font-sans font-medium'>{firstTxDate}</div></div></div>
-            <div className=" bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Number of Tokens: <div className='text-white py-2 text-2xl font-sans font-medium'>{erc20Count}</div></div></div>
-            <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-xl text-[#cfc8c8] font-sans font-medium'>Address: <div className='text-white py-2 text-2xl font-sans font-medium'>{address}</div></div></div>
-          </div>
-        </div>
-    </div>
-  )
-}
 
-export default Home 
+        <nav className="bg-[#000000]">
+          <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl">
+              <button onClick={handleButtonClick} className="flex items-center justify-center">
+                  <div className="h-16" />
+                  {/* <span className="ml-4 uppercase font-black">clara<br/>thella</span> */}
+                  <Image
+                    src="/logo.png"
+                    alt="thirdweb Logo"
+                    width={60}
+                    height={60}
+                    className={styles.buttonGapTop}
+                  />
+                  <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
+              </button>
+              <nav className="contents font-semibold text-base lg:text-lg">
+              <ul className="mx-auto flex items-center">
+                  
+                  <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                      Home
+                  </button>
+                  <button className="p-5 xl:p-8 text-[#c1c1c1] active ">
+                      Mint
+                  </button>
+                  <button className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                      About
+                  </button>
+                  <button className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                      Whitepaper
+                  </button>
+              </ul>
+              </nav>
+              
+                  <ConnectWallet 
+                      accentColor="#000000"
+                      colorMode="light"
+                      btnTitle="Connect Wallet"
+                  />
+              
+          </div>
+      </nav>
+
+      <div className={styles.container}>
+        <div className={styles.mintInfoContainer}>
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <>
+              <div className={styles.infoSide}>
+                <h1 className='text-[3.5em] w-full'>ZkSync Score NFT</h1><br/>
+                <h2 className='text-2xl mt-5'>Check your activity score on ZkSync and mint NFT</h2><br/>
+                <h2 className='text-2xl mt-5'>Mint 1$ + gas</h2><br/>
+                <div>
+                  <button onClick={zksyncBridge} className="inline">
+                    <Image src="/insta.png" alt="thirdweb Logo" width= {40} height={40} />
+                  </button>
+                  <button onClick={zksyncTwitter} className="inline">
+                    <Image src="/twitter.png" alt="thirdweb Logo" width= {40} height={40} />
+                  </button>
+                  <button onClick={zksyncWebsite} className="ml-2 inline">
+                    <Image src="/logo.png" alt="thirdweb Logo" width= {40} height={40}/>
+                  </button>
+                  </div>
+              </div>
+
+              <div className={styles.imageSide}>
+                {/* Image Preview of NFTs */}
+                <img
+                  className={styles.image}
+                  src={contractMetadata?.image}
+                  alt={`${contractMetadata?.name} preview image`}
+
+                />
+
+                {/* Amount claimed so far */}
+                <div className={styles.mintCompletionArea}>
+                  <div className={styles.mintAreaLeft}>
+                    <p>Total Minted</p>
+                  </div>
+                  <div className={styles.mintAreaRight}>
+                    {claimedSupply ? (
+                      <p>
+                        <b>{numberClaimed}</b>
+                        {" / "}
+                        {numberTotal || "∞"}
+                      </p>
+                    ) : (
+                      // Show loading state if we're still loading the supply
+                      <p>Loading...</p>
+                    )}
+                  </div>
+                </div>
+
+                {claimConditions.data?.length === 0 ||
+                claimConditions.data?.every(
+                  (cc) => cc.maxClaimableSupply === "0"
+                ) ? (
+                  <div>
+                    <h2>
+                      This drop is not ready to be minted yet. (No claim condition
+                      set)
+                    </h2>
+                  </div>
+                ) : (
+                  <>
+                    {/* <p className='flex justify-center'>Quantity</p>
+                    <div className={styles.quantityContainer}>
+                      <button
+                        className={`${styles.quantityControlButton}`}
+                        onClick={() => setQuantity(quantity - 1)}
+                        disabled={quantity <= 1}
+                      >
+                        -
+                      </button>
+
+                      <h4>{quantity}</h4>
+
+                      <button
+                        className={`${styles.quantityControlButton}`}
+                        onClick={() => setQuantity(quantity + 1)}
+                        disabled={quantity >= maxClaimable}
+                      >
+                        +
+                      </button>
+                    </div> */}
+
+                    <div className={styles.mintContainer}>
+                      {isSoldOut ? (
+                        <div>
+                          <h2>Sold Out</h2>
+                        </div>
+                      ) : (
+                        <Web3Button
+                          contractAddress={editionDrop?.getAddress() || ""}
+                          action={(cntr) => cntr.erc1155.claim(tokenId, quantity)}
+                          isDisabled={!canClaim || buttonLoading}
+                          onError={(err) => {
+                            console.error(err);
+                            alert("Error claiming NFTs");
+                          }}
+                          onSuccess={() => {
+                            setQuantity(1);
+                            alert("Successfully claimed NFTs");
+                          }}
+                        >
+                          {buttonLoading ? "Loading..." : buttonText}
+                        </Web3Button>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+        {/* Powered by thirdweb */}{" "}
+        {/* <img
+          src="/logo.png"
+          alt="thirdweb Logo"
+          width={135}
+          className={styles.buttonGapTop}
+        /> */}
+      </div>
+    </div>
+  );
+};
+
+export default Home;

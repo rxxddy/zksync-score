@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app'
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 import Head from "next/head";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "."
+import Home from "./home"
 // This is the chainId your dApp will work on.
 const activeChain = "binance-testnet";
 
