@@ -231,94 +231,122 @@ const Home: NextPage = () => {
     window.location.href = 'https://portal.zksync.io/bridge';
   }
 
+  const [selected, setSelected] = useState(null);
+
+
+
+  const images = [
+    "https://image.api.playstation.com/vulcan/ap/rnd/202303/0621/d3c11818a78c6495e84a3d8e8dd6dc652721be36e0eb8c0a.png",
+    "https://image.api.playstation.com/vulcan/ap/rnd/202211/1601/a8lO7A5RQI2i0tdynjT0dkFC.png",
+    "https://www.serial-gamers.fr/wp-content/uploads/2021/01/unnamed-file-289.jpg",
+    "https://media-assets.wired.it/photos/635fe3ebee513782eb4b651b/1:1/w_2160,h_2160,c_limit/Fortnite-Ralph%20Lauren%20x%20Fortnite-2.png",
+    "https://assets2.rockpapershotgun.com/fortnite-chapter-3-season-1-the-foundation.jpg/BROK/thumbnail/1200x1200/quality/100/fortnite-chapter-3-season-1-the-foundation.jpg",
+    "https://assets.reedpopcdn.com/Untitled-1_HA20Dxv.jpg/BROK/thumbnail/1200x1200/quality/100/Untitled-1_HA20Dxv.jpg"
+  ];
+
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+
   return (
     <div>
 
         <nav className="bg-[#000000]">
-        <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl">
-                <button onClick={handleButtonClick} className="flex items-center justify-center">
-                    <div className="h-16" />
-                    {/* <span className="ml-4 uppercase font-black">clara<br/>thella</span> */}
-                    <Image
-                      src="/logo.png"
-                      alt="thirdweb Logo"
-                      width={`30vh`}
-                      height={`30vh`}
-                    />
-                    <h1 className='text-[2vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
-                </button>
-                <nav className="contents font-semibold text-base lg:text-lg">
-                <ul className="mx-auto flex items-center">
-                    
-                    <div className=" p-5 xl:p-8 text-[#c1c1c1] active">
-                        Home
-                    </div>
-                    <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Mint
-                    </button>
+          <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl">
+              <button onClick={handleButtonClick} className="flex items-center justify-center">
 
-                </ul>
-                </nav>
-                
-                    <ConnectWallet 
-                        accentColor="#000000"
-                        colorMode="dark"
-                        btnTitle="Connect Wallet"
-                    />
-                
-            </div>
+                  <Image
+                    src="/logo.png"
+                    alt="thirdweb Logo"
+                    width={60}
+                    height={60}
+                    className={styles.buttonGapTop}
+                  />
+                  <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
+              </button>
+              <nav className="contents font-semibold text-base lg:text-lg">
+              <ul className="mx-auto flex items-center">
+                  
+                  <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                      Home
+                  </button>
+                  <button className="p-5 xl:p-8 text-[#c1c1c1] active ">
+                      Mint
+                  </button>
+              </ul>
+              </nav>
+              
+                  <ConnectWallet 
+                      accentColor="#000000"
+                      colorMode="light"
+                      btnTitle="Connect Wallet"
+                  />
+              
+          </div>
       </nav>
 
-      <div className={styles.container}>
-        <div className={styles.mintInfoContainer}>
+      <div className="h-[100%]">
+        
           {isLoading ? (
             <p>Loading...</p>
           ) : (
             <>
-              <div className={styles.infoSide}>
-                <h1 className='text-[3.5em] w-full'>ZkSync Score NFT</h1><br/>
-                <h2 className='text-2xl mt-5'>Check your activity score on ZkSync and mint NFT</h2><br/>
-                <h2 className='text-2xl mt-5'>Mint 1$ + gas</h2><br/>
-                <div>
-                  <button onClick={zksyncBridge} className="inline">
-                    <Image src="/insta.png" alt="thirdweb Logo" width= {40} height={40} />
-                  </button>
-                  <button onClick={zksyncTwitter} className="inline">
-                    <Image src="/twitter.png" alt="thirdweb Logo" width= {40} height={40} />
-                  </button>
-                  <button onClick={zksyncWebsite} className="ml-2 inline">
-                    <Image src="/logo.png" alt="thirdweb Logo" width= {40} height={40}/>
-                  </button>
-                  </div>
-              </div>
 
-              <div className={styles.imageSide}>
-                {/* Image Preview of NFTs */}
-                <img
-                  className={styles.image}
-                  src={contractMetadata?.image}
-                  alt={`${contractMetadata?.name} preview image`}
-
-                />
-
-                {/* Amount claimed so far */}
-                <div className={styles.mintCompletionArea}>
-                  <div className={styles.mintAreaLeft}>
-                    <p>Total Minted</p>
+            {/* <div className="fixed bottom-[10%] w-full flex justify-center">
+                  <div className="w-7.5/12 flex justify-between gap-8">
+                    {images.map((imgSrc, index) => (
+                      <div
+                        key={index}
+                        className="h-[16em] w-[12em] relative cursor-pointer"
+                        onClick={() => setSelectedImage(index)}
+                      >
+                        <img
+                          src={imgSrc}
+                          alt=""
+                          className="absolute inset-0 w-full object-cover"
+                        />
+                        <div
+                          className={`absolute bottom-0 w-full h-[30%] ${
+                            selectedImage === index ? "bg-white" : "bg-gray-500"
+                          }`}
+                        ></div>
+                        {selectedImage === index && (
+                          <div
+                            className="absolute inset-0 border-2 border-white"
+                            style={{ pointerEvents: "none" }}
+                          ></div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  <div className={styles.mintAreaRight}>
-                    {claimedSupply ? (
-                      <p>
-                        <b>{numberClaimed}</b>
-                        {" / "}
-                        {numberTotal || "∞"}
-                      </p>
-                    ) : (
-                      // Show loading state if we're still loading the supply
-                      <p>Loading...</p>
-                    )}
-                  </div>
-                </div>
+                </div> */}
+
+<div className="fixed bottom-[10%] w-full flex justify-center px-5">
+  <div className="w-7.5/12 flex justify-between gap-8 overflow-x-auto">
+    {images.map((imgSrc, index) => (
+      <div
+        key={index}
+        className="h-[16em] w-[12em] relative cursor-pointer flex-shrink-0"
+        onClick={() => setSelectedImage(index)}
+      >
+        <img
+          src={imgSrc}
+          alt=""
+          className="absolute inset-0 w-full object-cover"
+        />
+        <div
+          className={`absolute bottom-0 w-full h-[30%] ${
+            selectedImage === index ? "bg-white" : "bg-gray-500"
+          }`}
+        ></div>
+        {selectedImage === index && (
+          <div
+            className="absolute inset-0 border-2 border-white"
+            style={{ pointerEvents: "none" }}
+          ></div>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
 
                 {claimConditions.data?.length === 0 ||
                 claimConditions.data?.every(
@@ -332,26 +360,6 @@ const Home: NextPage = () => {
                   </div>
                 ) : (
                   <>
-                    {/* <p className='flex justify-center'>Quantity</p>
-                    <div className={styles.quantityContainer}>
-                      <button
-                        className={`${styles.quantityControlButton}`}
-                        onClick={() => setQuantity(quantity - 1)}
-                        disabled={quantity <= 1}
-                      >
-                        -
-                      </button>
-
-                      <h4>{quantity}</h4>
-
-                      <button
-                        className={`${styles.quantityControlButton}`}
-                        onClick={() => setQuantity(quantity + 1)}
-                        disabled={quantity >= maxClaimable}
-                      >
-                        +
-                      </button>
-                    </div> */}
 
                     <div className={styles.mintContainer}>
                       {isSoldOut ? (
@@ -378,17 +386,10 @@ const Home: NextPage = () => {
                     </div>
                   </>
                 )}
-              </div>
+              
             </>
           )}
-        </div>
-        {/* Powered by thirdweb */}{" "}
-        {/* <img
-          src="/logo.png"
-          alt="thirdweb Logo"
-          width={135}
-          className={styles.buttonGapTop}
-        /> */}
+        
       </div>
     </div>
   );
