@@ -218,9 +218,9 @@ const Home: NextPage = () => {
 
 
 
-  function handleButtonClick() {
-    window.location.href = '/home';
-  }
+  // function handleButtonClick() {
+  //   window.location.href = '/home';
+  // }
   function zksyncTwitter() {
     window.location.href = 'https://twitter.com/zksync';
   }
@@ -236,21 +236,33 @@ const Home: NextPage = () => {
 
 
   const images = [
-    "https://image.api.playstation.com/vulcan/ap/rnd/202303/0621/d3c11818a78c6495e84a3d8e8dd6dc652721be36e0eb8c0a.png",
-    "https://image.api.playstation.com/vulcan/ap/rnd/202211/1601/a8lO7A5RQI2i0tdynjT0dkFC.png",
-    "https://www.serial-gamers.fr/wp-content/uploads/2021/01/unnamed-file-289.jpg",
-    "https://media-assets.wired.it/photos/635fe3ebee513782eb4b651b/1:1/w_2160,h_2160,c_limit/Fortnite-Ralph%20Lauren%20x%20Fortnite-2.png",
-    "https://assets2.rockpapershotgun.com/fortnite-chapter-3-season-1-the-foundation.jpg/BROK/thumbnail/1200x1200/quality/100/fortnite-chapter-3-season-1-the-foundation.jpg",
-    "https://assets.reedpopcdn.com/Untitled-1_HA20Dxv.jpg/BROK/thumbnail/1200x1200/quality/100/Untitled-1_HA20Dxv.jpg"
+    "https://image.binance.vision/editor-uploads-original/9c15d9647b9643dfbc5e522299d13593.png",
+    "https://static.cryptobriefing.com/wp-content/uploads/2022/01/31074857/bored-ape-unnamed-1-440x440.png",
+    "https://wwwcoleccionnftes434d3.zapwp.com/q:i/r:0/wp:1/w:1/u:https://www.coleccionnft.es/wp-content/uploads/2021/12/bored-ape3749.png",
+    "https://news.artnet.com/app/news-upload/2021/09/Yuga-Labs-Bored-Ape-Yacht-Club-4466.jpg",
+    "https://www.thestreet.com/.image/t_share/MTgyMDU5NDcwMTc4NzU1NzE1/boredape1.jpg",
+    "https://img.seadn.io/files/38e44ccc1aab2a9fb328e451c3892d9c.png?auto=format&w=600"
   ];
 
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleMobileMenuClick = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  function handleButtonClick() {
+    setIsMobileMenuOpen(false);
+    window.location.href = '/home';
+  }
+
 
   return (
     <div>
 
         <nav className="bg-[#000000]">
-          <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl">
+          <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl justify-between">
               <button onClick={handleButtonClick} className="flex items-center justify-center">
 
                   <Image
@@ -262,8 +274,9 @@ const Home: NextPage = () => {
                   />
                   <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
               </button>
-              <nav className="contents font-semibold text-base lg:text-lg">
-              <ul className="mx-auto flex items-center">
+
+              {/* <nav className="contents font-semibold text-base lg:text-lg">
+                <ul className="mx-auto flex items-center">
                   
                   <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
                       Home
@@ -271,61 +284,131 @@ const Home: NextPage = () => {
                   <button className="p-5 xl:p-8 text-[#c1c1c1] active ">
                       Mint
                   </button>
-              </ul>
-              </nav>
+                </ul>
+                <ConnectWallet 
+                    accentColor="#000000"
+                    colorMode="light"
+                    btnTitle="Connect Wallet"
+                />
+              </nav> */}
               
-                  <ConnectWallet 
-                      accentColor="#000000"
-                      colorMode="light"
-                      btnTitle="Connect Wallet"
+              <nav className="contents font-semibold text-base lg:text-lg">
+                <div className="flex justify-between items-center md:hidden">
+                  <button
+                    onClick={handleMobileMenuClick}
+                    className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]"
+                  >
+                    Menu
+                  </button>
+                </div>
+                <ul className="mx-auto hidden md:flex items-center">
+                  <li>
+                    <button
+                      onClick={handleButtonClick}
+                      className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]"
+                    >
+                      Home
+                    </button>
+                  </li>
+                  <li>
+                    <button className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
+                  </li>
+                </ul>
+                {isMobileMenuOpen && (
+                  <ul
+                    className="md:hidden absolute top-16 inset-x-0 bg-[#a9a9a9] z-50 w-[70%] m-auto rounded-xl mt-5"
+                    style={{ transform: "translateY(0%)" }}
+                  >
+                    <li>
+                      <button
+                        onClick={handleButtonClick}
+                        className="block w-full py-3 text-center text-[#000000] hover:text-[#ffffff] p-4"
+                      >
+                        Home
+                      </button>
+                    </li>
+                    <li>
+                      <button className="block w-full py-3 text-center text-[#000000]">
+                        Mint
+                      </button>
+                    </li>
+                    <li>
+                      <ConnectWallet
+                        accentColor="#a9a9a9"
+                        colorMode="dark"
+                        btnTitle="Connect Wallet"
+                      />
+                    </li>
+                  </ul>
+                )}
+                <div className="hidden md:block">
+                  <ConnectWallet
+                    accentColor="#000000"
+                    colorMode="light"
+                    btnTitle="Connect Wallet"
                   />
+                </div>
+              </nav>
               
           </div>
       </nav>
 
-      <div className="h-[100%]">
+      <div className="h-[50vh] items-center m-auto flex justify-center">
         
           {isLoading ? (
             <p>Loading...</p>
           ) : (
             <>
 
-            {/* <div className="fixed bottom-[10%] w-full flex justify-center">
-                  <div className="w-7.5/12 flex justify-between gap-8">
-                    {images.map((imgSrc, index) => (
-                      <div
-                        key={index}
-                        className="h-[16em] w-[12em] relative cursor-pointer"
-                        onClick={() => setSelectedImage(index)}
-                      >
-                        <img
-                          src={imgSrc}
-                          alt=""
-                          className="absolute inset-0 w-full object-cover"
-                        />
-                        <div
-                          className={`absolute bottom-0 w-full h-[30%] ${
-                            selectedImage === index ? "bg-white" : "bg-gray-500"
-                          }`}
-                        ></div>
-                        {selectedImage === index && (
-                          <div
-                            className="absolute inset-0 border-2 border-white"
-                            style={{ pointerEvents: "none" }}
-                          ></div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div> */}
-
-<div className="fixed bottom-[10%] w-full flex justify-center px-5">
-  <div className="w-7.5/12 flex justify-between gap-8 overflow-x-auto">
+{/* <div className="fixed bottom-[10%] w-full flex justify-center ">
+  <div className="w-7.5/12 flex justify-between gap-8">
+    {images.map((imgSrc, index) => (
+      <div
+        key={index}
+        className="h-[16em] w-[12em] relative cursor-pointer"
+        onClick={() => setSelectedImage(index)}
+        style={{ boxShadow: "none" }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0px 0px 10px 1px #ffffff";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "none";
+        }}
+      >
+        <img
+          src={imgSrc}
+          alt=""
+          className="absolute inset-0 w-full object-cover"
+        />
+        <div
+          className={`absolute bottom-0 w-full h-[30%] ${
+            selectedImage === index ? "bg-white" : "bg-gray-500"
+          }`}
+        ></div>
+        {selectedImage === index && (
+          <div
+            className="absolute inset-0 border-2 border-white"
+            style={{ pointerEvents: "none" }}
+          ></div>
+        )}
+      </div>
+    ))}
+  </div>
+</div> */}
+<div className="fixed bottom-[4%] w-full flex justify-center px-5">
+  <div className="w-7.5/12 flex justify-between gap-8 overflow-x-auto pb-8">
     {images.map((imgSrc, index) => (
       <div
         key={index}
         className="h-[16em] w-[12em] relative cursor-pointer flex-shrink-0"
         onClick={() => setSelectedImage(index)}
+        style={{ boxShadow: "none" }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0px 0px 10px 1px #ffffff";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "none";
+        }}
       >
         <img
           src={imgSrc}
