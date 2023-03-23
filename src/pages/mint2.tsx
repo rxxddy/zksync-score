@@ -1,10 +1,8 @@
-import Head from 'next/head'
 import Image from 'next/image'
 // import { Inter } from 'next/font/google'
 import styles from '@/styles/Theme.module.css'
 
 import { ConnectWallet } from "@thirdweb-dev/react";
-import { Link } from "react-router-dom";
 
 import {
   useActiveClaimConditionForWallet,
@@ -21,8 +19,6 @@ import { BigNumber, utils } from "ethers";
 import type { NextPage } from "next";
 import { useMemo, useState } from "react";
 import { parseIneligibility } from "../utils/parseIneligibility";
-import Logo from "../../public/logo.png"
-import { BrowserRouter } from 'react-router-dom';
 
 
 // Put Your Edition Drop Contract address from the dashboard here
@@ -256,6 +252,7 @@ const Home: NextPage = () => {
     setIsMobileMenuOpen(false);
     window.location.href = '/home';
   }
+  
 
 
   return (
@@ -274,23 +271,6 @@ const Home: NextPage = () => {
                   />
                   <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
               </button>
-
-              {/* <nav className="contents font-semibold text-base lg:text-lg">
-                <ul className="mx-auto flex items-center">
-                  
-                  <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                      Home
-                  </button>
-                  <button className="p-5 xl:p-8 text-[#c1c1c1] active ">
-                      Mint
-                  </button>
-                </ul>
-                <ConnectWallet 
-                    accentColor="#000000"
-                    colorMode="light"
-                    btnTitle="Connect Wallet"
-                />
-              </nav> */}
               
               <nav className="contents font-semibold text-base lg:text-lg">
                 <div className="flex justify-between items-center md:hidden">
@@ -353,83 +333,54 @@ const Home: NextPage = () => {
           </div>
       </nav>
 
-      <div className="h-[50vh] items-center m-auto flex justify-center">
+      <div className=" m-auto flex justify-center">
         
           {isLoading ? (
             <p>Loading...</p>
           ) : (
             <>
-
-{/* <div className="fixed bottom-[10%] w-full flex justify-center ">
-  <div className="w-7.5/12 flex justify-between gap-8">
-    {images.map((imgSrc, index) => (
-      <div
-        key={index}
-        className="h-[16em] w-[12em] relative cursor-pointer"
-        onClick={() => setSelectedImage(index)}
-        style={{ boxShadow: "none" }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = "0px 0px 10px 1px #ffffff";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = "none";
-        }}
-      >
-        <img
-          src={imgSrc}
-          alt=""
-          className="absolute inset-0 w-full object-cover"
-        />
-        <div
-          className={`absolute bottom-0 w-full h-[30%] ${
-            selectedImage === index ? "bg-white" : "bg-gray-500"
-          }`}
-        ></div>
-        {selectedImage === index && (
-          <div
-            className="absolute inset-0 border-2 border-white"
-            style={{ pointerEvents: "none" }}
-          ></div>
-        )}
+      <div className=' flex justify-center m-auto'>
+        <div className='bg-white rounded-3xl w-[600px] h-[600px]'>
+          {selectedImage !== null && (
+            <img src={images[selectedImage]} alt='' className='w-full h-full object-contain' />
+          )}
+        </div>
       </div>
-    ))}
-  </div>
-</div> */}
-<div className="fixed bottom-[4%] w-full flex justify-center px-5">
-  <div className="w-7.5/12 flex justify-between gap-8 overflow-x-auto pb-8">
-    {images.map((imgSrc, index) => (
-      <div
-        key={index}
-        className="h-[16em] w-[12em] relative cursor-pointer flex-shrink-0"
-        onClick={() => setSelectedImage(index)}
-        style={{ boxShadow: "none" }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = "0px 0px 10px 1px #ffffff";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = "none";
-        }}
-      >
-        <img
-          src={imgSrc}
-          alt=""
-          className="absolute inset-0 w-full object-cover"
-        />
-        <div
-          className={`absolute bottom-0 w-full h-[30%] ${
-            selectedImage === index ? "bg-white" : "bg-gray-500"
-          }`}
-        ></div>
-        {selectedImage === index && (
-          <div
-            className="absolute inset-0 border-2 border-white"
-            style={{ pointerEvents: "none" }}
-          ></div>
-        )}
+      <div className="fixed bottom-[4%] w-full flex justify-center px-5">
+        <div className="w-7.5/12 flex justify-between gap-8 overflow-x-auto pb-8">
+          {images.map((imgSrc, index) => (
+            <div
+              key={index}
+              className="h-[16em] w-[12em] relative cursor-pointer flex-shrink-0"
+              onClick={() => setSelectedImage(index)}
+              style={{ boxShadow: "none" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "0px 0px 10px 1px #ffffff";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              <img
+                src={imgSrc}
+                alt=""
+                className="absolute inset-0 w-full object-cover"
+              />
+              <div
+                className={`absolute bottom-0 w-full h-[30%] ${
+                  selectedImage === index ? "bg-white" : "bg-gray-500"
+                }`}
+              ></div>
+              {selectedImage === index && (
+                <div
+                  className="absolute inset-0 border-2 border-white"
+                  style={{ pointerEvents: "none" }}
+                ></div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
-</div>
 
                 {claimConditions.data?.length === 0 ||
                 claimConditions.data?.every(
@@ -444,7 +395,7 @@ const Home: NextPage = () => {
                 ) : (
                   <>
 
-                    <div className={styles.mintContainer}>
+                    <div className="absolute">
                       {isSoldOut ? (
                         <div>
                           <h2>Sold Out</h2>

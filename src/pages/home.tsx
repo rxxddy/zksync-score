@@ -159,6 +159,9 @@ useEffect(() => {
 function handleButtonClick() {
   window.location.href = '/';
 }
+function handleButtonClick2() {
+  window.location.href = '/mint2';
+}
 
   function month() {
     console.log(walletAge)
@@ -318,6 +321,12 @@ function handleButtonClick() {
                     </div>
                     <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
                         Mint
+                    </button>
+                    <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                        Console
+                    </button>
+                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
+                        Mint2
                     </button>
                     {/* <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
                         About

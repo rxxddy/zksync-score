@@ -231,6 +231,8 @@ const Home: NextPage = () => {
     window.location.href = 'https://portal.zksync.io/bridge';
   }
 
+  
+
   return (
     <div>
 
