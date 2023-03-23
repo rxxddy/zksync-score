@@ -240,7 +240,7 @@ const Home: NextPage = () => {
     "https://img.seadn.io/files/38e44ccc1aab2a9fb328e451c3892d9c.png?auto=format&w=600"
   ];
 
-  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -258,8 +258,8 @@ const Home: NextPage = () => {
   return (
     <div>
 
-        <nav className="bg-[#000000]">
-          <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl justify-between">
+        <nav className="backdrop-blur-2xl">
+          <div className=" container mx-auto flex items-center h-24 rounded-3xl justify-between">
               <button onClick={handleButtonClick} className="flex items-center justify-center">
 
                   <Image
@@ -314,7 +314,7 @@ const Home: NextPage = () => {
                     </li>
                     <li>
                       <ConnectWallet
-                        accentColor="#a9a9a9"
+                        accentColor="#ffffff"
                         colorMode="dark"
                         btnTitle="Connect Wallet"
                       />
@@ -323,7 +323,7 @@ const Home: NextPage = () => {
                 )}
                 <div className="hidden md:block">
                   <ConnectWallet
-                    accentColor="#000000"
+                    accentColor="#ffffff"
                     colorMode="light"
                     btnTitle="Connect Wallet"
                   />
@@ -333,7 +333,7 @@ const Home: NextPage = () => {
           </div>
       </nav>
 
-      <div className=" m-auto flex justify-center">
+      <div className="h-full items-end m-auto flex justify-center">
         
           {isLoading ? (
             <p>Loading...</p>
@@ -395,7 +395,7 @@ const Home: NextPage = () => {
                 ) : (
                   <>
 
-                    <div className="absolute">
+                    <div className="absolute mb-2">
                       {isSoldOut ? (
                         <div>
                           <h2>Sold Out</h2>

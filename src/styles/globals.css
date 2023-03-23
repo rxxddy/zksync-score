@@ -7,7 +7,11 @@
 /* Change the values in here to match your branding */
 :root {
   /* Background color of the page */
-  --background-color: #000000;
+  /* --background-color: #000000; */
+
+  background-image: url("https://preview.redd.it/ab94i3q4agk21.jpg?auto=webp&s=7e8a12e5999c1d265b9bd05a28025e06382cc085");
+  background-repeat: no-repeat;
+  background-size: cover;
 
   /* Color of the text/words */
   --text-color: #fff;
