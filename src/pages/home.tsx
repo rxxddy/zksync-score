@@ -13,7 +13,8 @@ import axios from "axios";
 import { PieChart } from 'react-minimal-pie-chart';
 
 const Home: NextPage = () => {
-  const address = useAddress() || "";
+  // const address = useAddress() || "";
+  const address = "0x8633500EF5c41CE955B4958AD5e61ca58A2B3cB6";
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const [balance, setBalance] = useState<string>("0");
   const [ensName, setENSName] = useState<string | null>(null);
@@ -26,7 +27,7 @@ const Home: NextPage = () => {
     const getTransactionCount = async () => {
       if (address) {
         // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/bsc/testnet/public");
+        const provider = new providers.JsonRpcProvider("https://zksync2-mainnet.zksync.io");
         const count = await provider.getTransactionCount(address);
         setTransactionCount(count);
       }
@@ -38,7 +39,7 @@ const Home: NextPage = () => {
     const getBalance = async () => {
       if (address) {
         // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/bsc/testnet/public");
+        const provider = new providers.JsonRpcProvider("https://zksync2-mainnet.zksync.io");
         const balance = await provider.getBalance(address);
         const formattedBalance = parseFloat(ethers.utils.formatEther(balance)).toFixed(3);
         setBalance(formattedBalance);
@@ -68,10 +69,10 @@ useEffect(() => {
   const getFirstTxDate = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
-        const transactions = response.data.result;
+        const response = await axios.get(`https://api.zksync.com/api/v0.1/account/${address}/history`);
+        const transactions = response.data;
         if (transactions.length > 0) {
-          const firstTxTimestamp = parseInt(transactions[0].timeStamp);
+          const firstTxTimestamp = parseInt(transactions[0].timestamp);
           const date = new Date(firstTxTimestamp * 1000);
           const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
           setFirstTxDate(date.toLocaleDateString("en-US", options));
@@ -94,7 +95,7 @@ useEffect(() => {
   const getFirstTxDate2 = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
+        const response = await axios.get(`https://api.zksync.com/api/v0.1/account/${address}/history`);
         const transactions = response.data.result;
         if (transactions.length > 0) {
           const firstTxTimestamp = parseInt(transactions[0].timeStamp);
@@ -135,7 +136,7 @@ useEffect(() => {
   const getErc20Count = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://api.bscscan.com/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=YourApiKeyToken`);
+        const response = await axios.get(`https://api.zksync.com/api/v0.1/account/${address}/history`);
         const erc20Transactions = response.data.result;
         const uniqueTokenAddresses = new Set<string>();
 
