@@ -20,14 +20,14 @@
 }
 
 .mintInfoContainer {
-  /* margin-top: 5vh; */
+  margin-top: 5vh;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   width: 100%;
   padding: 0 24px;
-  min-height: 720px;
+  min-height: 45vh;
   max-width: 95vw;
   gap: 2%;
   border-radius: 16px;
