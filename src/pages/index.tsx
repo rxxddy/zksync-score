@@ -261,7 +261,7 @@ const Home: NextPage = () => {
                     height={60}
                     
                   />
-                  <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
+                  <h1 className='text-[3vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
               </button>
               
               <nav className="contents font-semibold text-base lg:text-lg">
