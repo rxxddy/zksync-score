@@ -27,7 +27,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 // Put Your Edition Drop Contract address from the dashboard here
 const myEditionDropContractAddress =
-  "0x9502DbD5264D26dF4A75B68E98026219e107143b";
+  "0xaA9227cb66Cdb0c1602f43E4d1bc1892f8704707";
 
 // Put your token ID here
 const tokenId = 0;
@@ -218,11 +218,11 @@ const Home: NextPage = () => {
 
 
 
-  function handleButtonClick() {
-    window.location.href = '/home';
-  }
+  // function handleButtonClick() {
+  //   window.location.href = '/home';
+  // }
   function handleButtonClick2() {
-    window.location.href = '/mint2';
+    window.location.href = '/';
   }
   function zksyncTwitter() {
     window.location.href = 'https://twitter.com/zksync';
@@ -234,47 +234,95 @@ const Home: NextPage = () => {
     window.location.href = 'https://portal.zksync.io/bridge';
   }
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleMobileMenuClick = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  function handleButtonClick() {
+    setIsMobileMenuOpen(false);
+    window.location.href = '/home';
+  }
+
   
 
   return (
     <div>
 
-        <nav className="bg-[#000000]">
-        <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl">
-                <button onClick={handleButtonClick} className="flex items-center justify-center">
-                    <div className="h-16" />
-                    {/* <span className="ml-4 uppercase font-black">clara<br/>thella</span> */}
-                    <Image
-                      src="/logo.png"
-                      alt="thirdweb Logo"
-                      width={`30vh`}
-                      height={`30vh`}
-                    />
-                    <h1 className='text-[2vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
-                </button>
-                <nav className="contents font-semibold text-base lg:text-lg">
-                <ul className="mx-auto flex items-center">
-                    
-                    <div className=" p-5 xl:p-8 text-[#c1c1c1] active">
-                        Home
-                    </div>
-                    <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Mint
-                    </button>
-                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Mint2
-                    </button>
+      <nav className="backdrop-blur-2xl">
+          <div className=" container mx-auto flex items-center h-24 rounded-3xl justify-between">
+              <button onClick={handleButtonClick} className="ml-4 flex items-center justify-center">
 
+                  <Image
+                    src="/logo.png"
+                    alt="thirdweb Logo"
+                    width={60}
+                    height={60}
+                    
+                  />
+                  <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
+              </button>
+              
+              <nav className="contents font-semibold text-base lg:text-lg">
+                <div className="flex justify-between items-center md:hidden">
+                  <button
+                    onClick={handleMobileMenuClick}
+                    className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]"
+                  >
+                    Menu
+                  </button>
+                </div>
+                <ul className="mx-auto hidden md:flex items-center">
+                  <li>
+                    <button
+                      onClick={handleButtonClick}
+                      className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]"
+                    >
+                      Home
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
+                  </li>
                 </ul>
-                </nav>
-                
-                    <ConnectWallet 
-                        accentColor="#000000"
+                {isMobileMenuOpen && (
+                  <ul
+                    className="md:hidden absolute top-16 inset-x-0 bg-[#a9a9a9] z-50 w-[70%] m-auto rounded-xl mt-5"
+                    style={{ transform: "translateY(0%)" }}
+                  >
+                    <li>
+                      <button
+                        onClick={handleButtonClick}
+                        className="block w-full py-3 text-center text-[#000000] hover:text-[#ffffff] p-4"
+                      >
+                        Home
+                      </button>
+                    </li>
+                    <li>
+                      <button onClick={handleButtonClick2} className="block w-full py-3 text-center text-[#000000]">
+                        Mint
+                      </button>
+                    </li>
+                    <li>
+                      <ConnectWallet
+                        accentColor="#a9a9a9"
                         colorMode="dark"
                         btnTitle="Connect Wallet"
-                    />
-                
-            </div>
+                      />
+                    </li>
+                  </ul>
+                )}
+                <div className="hidden md:block">
+                  <ConnectWallet
+                    accentColor="black"
+                    colorMode="light"
+                    btnTitle="Connect Wallet"
+                  />
+                </div>
+              </nav>
+              
+          </div>
       </nav>
 
       <div className={styles.container}>
@@ -284,17 +332,17 @@ const Home: NextPage = () => {
           ) : (
             <>
               <div className={styles.infoSide}>
-                <h1 className='text-[3.5em] w-full'>ZkSync Score NFT</h1><br/>
-                <h2 className='text-2xl mt-5'>Check your activity score on ZkSync and mint NFT</h2><br/>
-                <h2 className='text-2xl mt-5'>Mint 1$ + gas</h2><br/>
+                <h1 className='text-[3.5em] sm:text-[2.5em] w-full'>ZkSync Score NFT</h1><br/>
+                <h2 className='text-2xl mt-5 sm:mt-1 sm:text-[0.9rem]'>Check your activity score on ZkSync and mint NFT</h2><br/>
+                <h2 className='text-2xl mt-5 sm:mt-1 sm:text-[0.9rem]'>Mint 1$ + gas</h2><br/>
                 <div>
-                  <button onClick={zksyncBridge} className="inline">
+                  <button onClick={zksyncBridge} className="inline sm:w-8">
                     <Image src="/insta.png" alt="thirdweb Logo" width= {40} height={40} />
                   </button>
-                  <button onClick={zksyncTwitter} className="inline">
+                  <button onClick={zksyncTwitter} className="inline sm:w-8">
                     <Image src="/twitter.png" alt="thirdweb Logo" width= {40} height={40} />
                   </button>
-                  <button onClick={zksyncWebsite} className="ml-2 inline">
+                  <button onClick={zksyncWebsite} className="ml-2 inline sm:w-8">
                     <Image src="/logo.png" alt="thirdweb Logo" width= {40} height={40}/>
                   </button>
                   </div>

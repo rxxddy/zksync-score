@@ -67,7 +67,7 @@
   width: 85%;
   border-radius: 16px;
   margin: auto;
-  padding: 7em;
+  padding: 7%;
 }
 
 .mainButton {
@@ -185,6 +185,15 @@
   }
 
   .imageSide {
+    width: 100%;
+  }
+
+  .image{
+    margin-top: 2em;
+    margin-bottom: 2em;
+  }
+
+  .mintCompletionArea{
     width: 100%;
   }
 }

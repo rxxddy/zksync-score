@@ -13,7 +13,7 @@ import axios from "axios";
 import { PieChart } from 'react-minimal-pie-chart';
 
 const Home: NextPage = () => {
-  const address = useAddress()
+  const address = useAddress() || "";
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const [balance, setBalance] = useState<string>("0");
   const [ensName, setENSName] = useState<string | null>(null);
@@ -156,11 +156,11 @@ useEffect(() => {
 
 
 
-function handleButtonClick() {
-  window.location.href = '/';
-}
+// function handleButtonClick() {
+//   window.location.href = '/';
+// }
 function handleButtonClick2() {
-  window.location.href = '/mint2';
+  window.location.href = '/';
 }
 
   function month() {
@@ -298,65 +298,98 @@ function handleButtonClick2() {
     }
   }
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleMobileMenuClick = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  function handleButtonClick() {
+    setIsMobileMenuOpen(false);
+    window.location.href = '/home';
+  }
+
+  const shortenedAddress = address.length > 8 ? `${address.slice(0, 4)}...${address.slice(-4)}` : address;
+
+
   return (
     <div>
-        <nav className="bg-[#000000]">
-            <div className="bg-[#000000] container mx-auto flex items-center h-24 rounded-3xl">
-                <button onClick={handleButtonClick} className="flex items-center justify-center">
-                    <div className="h-16" />
-                    {/* <span className="ml-4 uppercase font-black">clara<br/>thella</span> */}
-                    <Image
-                      src="/logo.png"
-                      alt="thirdweb Logo"
-                      width={`30vh`}
-                      height={`30vh`}
-                    />
-                    <h1 className='text-[2vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
-                </button>
-                <nav className="contents font-semibold text-base lg:text-lg">
-                <ul className="mx-auto flex items-center">
+        <nav className="backdrop-blur-2xl">
+          <div className=" container mx-auto flex items-center h-24 rounded-3xl justify-between">
+              <button onClick={handleButtonClick} className="ml-4 flex items-center justify-center">
+
+                  <Image
+                    src="/logo.png"
+                    alt="thirdweb Logo"
+                    width={60}
+                    height={60}
                     
-                    <div className=" p-5 xl:p-8 text-[#c1c1c1] active">
-                        Home
-                    </div>
-                    <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Mint
+                  />
+                  <h1 className='text-2xl ml-2 font-sans font-medium'>ZkSync Score</h1>
+              </button>
+              
+              <nav className="contents font-semibold text-base lg:text-lg">
+                <div className="flex justify-between items-center md:hidden">
+                  <button
+                    onClick={handleMobileMenuClick}
+                    className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]"
+                  >
+                    Menu
+                  </button>
+                </div>
+                <ul className="mx-auto hidden md:flex items-center">
+                  <li>
+                    <button
+                      onClick={handleButtonClick}
+                      className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]"
+                    >
+                      Home
                     </button>
-                    <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Console
-                    </button>
-                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Mint2
-                    </button>
-                    {/* <button onClick={handleButtonClick} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        About
-                    </button>
-                    <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]">
-                        Get Wallet Info in console
-                    </button> */}
+                  </li>
+                  <li>
+                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
+                  </li>
                 </ul>
-                </nav>
-                
-                    <ConnectWallet 
-                        accentColor="#000000"
+                {isMobileMenuOpen && (
+                  <ul
+                    className="md:hidden absolute top-16 inset-x-0 bg-[#a9a9a9] z-50 w-[70%] m-auto rounded-xl mt-5"
+                    style={{ transform: "translateY(0%)" }}
+                  >
+                    <li>
+                      <button
+                        onClick={handleButtonClick}
+                        className="block w-full py-3 text-center text-[#000000] hover:text-[#ffffff] p-4"
+                      >
+                        Home
+                      </button>
+                    </li>
+                    <li>
+                      <button onClick={handleButtonClick2} className="block w-full py-3 text-center text-[#000000]">
+                        Mint
+                      </button>
+                    </li>
+                    <li>
+                      <ConnectWallet
+                        accentColor="#a9a9a9"
                         colorMode="dark"
                         btnTitle="Connect Wallet"
-                    />
-                
-            </div>
-        </nav>
-        <div className='w-[90%] max-w-screen-2xl m-auto mt-[8%] p-10 hidden sm:block'>
-          <div className="grid grid-cols-3 gap-8 m-auto">
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Transaction Count: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{transactionCount}</div></div></div>
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Your Balance: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{balance}</div></div></div>
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>ENS Name: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{ensName ? ensName : "none"}</div></div></div>
-            <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Your Score: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{Score}</div></div></div>
-            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Wallet Created: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{firstTxDate}</div></div></div>
-            <div className=" bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Number of Tokens: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{erc20Count}</div></div></div>
-            <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Address: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{address}</div></div></div>
+                      />
+                    </li>
+                  </ul>
+                )}
+                <div className="hidden md:block">
+                  <ConnectWallet
+                        accentColor="black"
+                        colorMode="dark"
+                        btnTitle="Connect Wallet"
+                  />
+                </div>
+              </nav>
+              
           </div>
-        </div>
-        <div className='w-[50vh] m-auto mt-[8%] p-10 block sm:hidden'>
+      </nav>
+        <div className='w-[100%] m-auto mt-[8%] p-10 block sm:hidden'>
+          <h1 className='text-3xl flex justify-center m-auto mb-8'>Your Score:</h1>
           <PieChart
             data={data}
             totalValue={200}
@@ -371,6 +404,28 @@ function handleButtonClick2() {
             startAngle={180}
           />
         </div>
+        <div className="grid grid-cols-1 gap-4 sm:hidden px-4 pb-8">
+            <div className="border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Address: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{shortenedAddress}</div></div></div>
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Transaction Count: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{transactionCount}</div></div></div>
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Your Balance: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{balance}</div></div></div>
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>ENS Name: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{ensName ? ensName : "none"}</div></div></div>
+            {/* <div className=" border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Your Score: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{Score}</div></div></div> */}
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Wallet Created: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{firstTxDate}</div></div></div>
+            <div className=" bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Number of Tokens: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{erc20Count}</div></div></div>
+            
+        </div>
+        <div className='w-[90%] max-w-screen-2xl m-auto mt-[8%] p-10 hidden sm:block'>
+          <div className="grid grid-cols-3 gap-8 m-auto">
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Transaction Count: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{transactionCount}</div></div></div>
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Your Balance: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{balance}</div></div></div>
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>ENS Name: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{ensName ? ensName : "none"}</div></div></div>
+            <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Your Score: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{Score}</div></div></div>
+            <div className="bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Wallet Created: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{firstTxDate}</div></div></div>
+            <div className=" bg-[#252525] h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Number of Tokens: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{erc20Count}</div></div></div>
+            <div className="col-span-2 border-[#cfc8c8] border-2 h-28 rounded-3xl text-center"><div className='py-5 text-[1.5vh] text-[#cfc8c8] font-sans font-medium'>Address: <div className='text-white py-2 text-[2vh] font-sans font-medium'>{shortenedAddress}</div></div></div>
+          </div>
+        </div>
+
     </div>
   )
 }
