@@ -332,9 +332,9 @@ const Home: NextPage = () => {
           ) : (
             <>
               <div className={styles.infoSide}>
-                <h1 className='text-[3.5em] sm:text-[2.5em] w-full'>ZkSync Score NFT</h1><br/>
-                <h2 className='text-2xl mt-5 sm:mt-1 sm:text-[0.9rem]'>Check your activity score on ZkSync and mint NFT</h2><br/>
-                <h2 className='text-2xl mt-5 sm:mt-1 sm:text-[0.9rem]'>Mint 1$ + gas</h2><br/>
+                <h1 className='text-[4vh] w-full'>ZkSync Score NFT</h1><br/>
+                <h2 className='text-[2vh] mt-5 sm:mt-1 '>Check your activity score on ZkSync and mint NFT</h2><br/>
+                <h2 className='text-[2vh] mt-5 sm:mt-1 '>Mint 1$ + gas</h2><br/>
                 <div>
                   <button onClick={zksyncBridge} className="inline sm:w-8">
                     <Image src="/insta.png" alt="thirdweb Logo" width= {40} height={40} />

@@ -30,7 +30,6 @@
   min-height: 720px;
   max-width: 95vw;
   gap: 2%;
-
   border-radius: 16px;
 }
 
@@ -54,7 +53,7 @@
 
 .description {
   opacity: 0.7;
-  font-size: 1rem;
+  font-size: 2vh;
 }
 
 .imageSide {
@@ -88,7 +87,7 @@
   transition-duration: 200ms;
   height: 3rem;
   min-width: 3rem;
-  font-size: 1rem;
+  font-size: 2vh;
   background: #e5e5ea;
   background-image: linear-gradient(
     to left,
@@ -155,7 +154,7 @@
   color: #fff;
   height: 48px;
   padding: 0 16px;
-  font-size: 1rem;
+  font-size: 2vh;
 }
 
 .quantityControlButton {
@@ -163,7 +162,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  font-size: 2rem;
+  font-size: 2vh;
   background-color: transparent;
   border: 1px solid grey;
   color: #fff;
