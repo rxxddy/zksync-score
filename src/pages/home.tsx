@@ -9,14 +9,20 @@ import { useAddress } from "@thirdweb-dev/react"
 import { useBalance } from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
 import axios from "axios";
-
+import * as zksync from "zksync";
 import { PieChart } from 'react-minimal-pie-chart';
+import { ethers as eth } from 'ethers';
+import { Provider, Wallet  } from 'zksync';
+import { getDefaultProvider } from "zksync";
+
+
 
 const Home: NextPage = () => {
-  const address = useAddress() || "";
+  // const address = useAddress() || "";
+  const address = "0xAbC04cF5299B9255612B314DfD2c60643AA3AC97";
   // const address = `0x705306Ac819EA86e717e1e180251799EBfac95e1` || "";
   const [transactionCount, setTransactionCount] = useState<number>(0);
-  const [balance, setBalance] = useState<string>("0");
+  const [balance, setBalance] = useState<string>(`0`);
   const [ensName, setENSName] = useState<string | null>(null);
   const [firstTxDate, setFirstTxDate] = useState<string>("");
   const [walletAge, setWalletAge] = useState<number | null>(null);
@@ -27,7 +33,7 @@ const Home: NextPage = () => {
     const getTransactionCount = async () => {
       if (address) {
         // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/bsc/mainnet/public");
+        const provider = new providers.JsonRpcProvider("https://mainnet.era.zksync.io");
         const count = await provider.getTransactionCount(address);
         setTransactionCount(count);
       }
@@ -39,7 +45,7 @@ const Home: NextPage = () => {
     const getBalance = async () => {
       if (address) {
         // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/bsc/mainnet/public");
+        const provider = new providers.JsonRpcProvider("https://mainnet.era.zksync.io");
         const balance = await provider.getBalance(address);
         const formattedBalance = parseFloat(ethers.utils.formatEther(balance)).toFixed(3);
         setBalance(formattedBalance);
@@ -48,20 +54,49 @@ const Home: NextPage = () => {
     getBalance();
   }, [address]);
 
-  
+  //
+
+  // useEffect(() => {
+  //   const getBalance = async () => {
+  //     if (address) {
+  //       const provider = await zksync.getDefaultProvider("mainnet");
+  //       const ethersProvider = new ethers.providers.JsonRpcProvider("https://zksync.api.vitalik.ca");
+  //       const ethersSigner = ethersProvider.getSigner();
+  //       const wallet = await zksync.Wallet.fromEthSigner(ethersSigner, provider);
+  //       const accountState = await wallet.getAccountState();
+  //       const balance = parseFloat(ethers.utils.formatEther(accountState.verified.balances[0])).toFixed(3);
+  //       setBalance(balance);
+  //     }
+  //   };
+  //   getBalance();
+  // }, [address]);
 
 
-  useEffect(() => {
-    const getENSName = async () => {
-      if (address) {
-        // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
-        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/eth/mainnet/public");
-        const name = await provider.lookupAddress(address);
-        setENSName(name);
-      }
-    };
-    getENSName();
-  }, [address]);
+
+  // const ZKSYNC_RPC_ENDPOINT = "https://api.zksync.io/jsrpc";
+
+  // useEffect(() => {
+  //   async function fetchBalance() {
+  //     if (!address) {
+  //       setBalance(`null`);
+  //       return;
+  //     }
+
+  //     const zksyncProvider = getDefaultProvider("mainnet");
+  //     const ethersProvider = new ethers.providers.JsonRpcProvider(
+  //       ZKSYNC_RPC_ENDPOINT
+  //     );
+  //     const ethersSigner = ethersProvider.getSigner();
+  //     const wallet = await Wallet.fromEthSigner(ethersSigner, await zksyncProvider);
+  //     const accountState = await wallet.getAccountState();
+  //     const formattedBalance = parseFloat(
+  //       ethers.utils.formatEther(accountState.committed.balances[0])
+  //     ).toFixed(3);
+  //     setBalance(formattedBalance);
+  //   }
+
+  //   fetchBalance();
+  // }, [address]);
 
 
 //
@@ -69,7 +104,7 @@ useEffect(() => {
   const getFirstTxDate = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
+        const response = await axios.get(`https://mainnet.era.zksync.io/api?module=account&action=txlist&address=${address}&sort=asc`);
         const transactions = response.data.result;
         if (transactions.length > 0) {
           const firstTxTimestamp = parseInt(transactions[0].timeStamp);
@@ -173,6 +208,27 @@ useEffect(() => {
 
   getErc20Count();
 }, [address]);
+
+
+
+
+// useEffect(() => {
+//   async function fetchBalance() {
+//     if (!address) {
+//       console.error("Invalid Ethereum address:", address);
+//       return;
+//     }
+//     const syncProvider = getDefaultProvider("mainnet");
+//     const provider = new ethers.providers.Web3Provider(window.ethereum as any);
+//     const signer = provider.getSigner(address);
+//     const wallet = await zksync.Wallet.fromEthSigner(signer, await syncProvider);
+
+//     const balance = await wallet.getBalance('ETH');
+//     setBalance(balance.toString());
+//   }
+//   fetchBalance();
+// }, [address]);
+
 
 
 
@@ -366,12 +422,7 @@ function handleButtonClick2() {
                     >
                       Home
                     </button>
-                    <button
-                      onClick={getConsoleInfo}
-                      className="p-5 xl:p-8 text-[#d9d9d9] active hover:text-[#ffffff]"
-                    >
-                      getConsoleInfo
-                    </button>
+                    
                   </li>
                   <li>
                     <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
