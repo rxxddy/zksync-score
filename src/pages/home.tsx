@@ -18,8 +18,8 @@ import { getDefaultProvider } from "zksync";
 
 
 const Home: NextPage = () => {
-  // const address = useAddress() || "";
-  const address = "0xAbC04cF5299B9255612B314DfD2c60643AA3AC97";
+  const address = useAddress() || "";
+  // const address = "0x05B591F1C07FAecD4325f70A932B9736a746cbC3";
   // const address = `0x705306Ac819EA86e717e1e180251799EBfac95e1` || "";
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const [balance, setBalance] = useState<string>(`0`);
@@ -28,6 +28,17 @@ const Home: NextPage = () => {
   const [walletAge, setWalletAge] = useState<number | null>(null);
   const [erc20Count, setErc20Count] = useState<number | null>(null);
 
+  useEffect(() => {
+    const getENSName = async () => {
+      if (address) {
+        // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
+        const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/eth/mainnet/public");
+        const name = await provider.lookupAddress(address);
+        setENSName(name);
+      }
+    };
+    getENSName();
+  }, [address]);
 
   useEffect(() => {
     const getTransactionCount = async () => {
@@ -104,7 +115,7 @@ useEffect(() => {
   const getFirstTxDate = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://mainnet.era.zksync.io/api?module=account&action=txlist&address=${address}&sort=asc`);
+        const response = await axios.get(`https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=asc`);
         const transactions = response.data.result;
         if (transactions.length > 0) {
           const firstTxTimestamp = parseInt(transactions[0].timeStamp);
@@ -122,35 +133,11 @@ useEffect(() => {
   getFirstTxDate();
 }, [address]);
 //
-
-//
-// useEffect(() => {
-//   const getFirstTxDate = async () => {
-//     try {
-//       const response = await axios.get(`https://api.zksync.com/api/v0.1/account/0xF69B8F2DD94A5d66D17f199881296E989be83340/history`);
-//       const transactions = response.data;
-//       if (transactions.length > 0) {
-//         const firstTxTimestamp = parseInt(transactions[0].created_at);
-//         const date = new Date(firstTxTimestamp);
-//         const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
-//           setFirstTxDate(date.toLocaleDateString("en-US", options));
-//       } else {
-//         setFirstTxDate("No transactions found");
-//       }
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-//   getFirstTxDate();
-// }, [address]);
-//
-
-
 useEffect(() => {
   const getFirstTxDate2 = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=asc`);
+        const response = await axios.get(`https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=asc`);
         const transactions = response.data.result;
         if (transactions.length > 0) {
           const firstTxTimestamp = parseInt(transactions[0].timeStamp);
@@ -187,25 +174,44 @@ useEffect(() => {
 
 
 
+// useEffect(() => {
+//   const getErc20Count = async () => {
+//     if (address) {
+//       try {
+//         const response = await axios.get(`https://api.bscscan.com/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=AU7VYBH19E4T8K1Z1BTKTNIR8PGN75W9DJ`);
+//         const erc20Transactions = response.data.result;
+//         const uniqueTokenAddresses = new Set<string>();
+
+//         erc20Transactions.forEach((tx: any) => {
+//           uniqueTokenAddresses.add(tx.contractAddress);
+//         });
+
+//         setErc20Count(uniqueTokenAddresses.size);
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     }
+//   };
+
+//   getErc20Count();
+// }, [address]);
+
 useEffect(() => {
   const getErc20Count = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://api.bscscan.com/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=AU7VYBH19E4T8K1Z1BTKTNIR8PGN75W9DJ`);
+        const response = await axios.get(`https://api.etherscan.io/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=AU7VYBH19E4T8K1Z1BTKTNIR8PGN75W9DJ`);
         const erc20Transactions = response.data.result;
         const uniqueTokenAddresses = new Set<string>();
-
         erc20Transactions.forEach((tx: any) => {
           uniqueTokenAddresses.add(tx.contractAddress);
         });
-
         setErc20Count(uniqueTokenAddresses.size);
       } catch (error) {
         console.log(error);
       }
     }
   };
-
   getErc20Count();
 }, [address]);
 
@@ -426,6 +432,9 @@ function handleButtonClick2() {
                   </li>
                   <li>
                     <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
+                  </li>
+                  <li>
+                    <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#c1c1c1] active ">getConsoleInfo</button>
                   </li>
                 </ul>
                 {isMobileMenuOpen && (
