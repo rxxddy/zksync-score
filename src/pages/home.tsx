@@ -19,7 +19,42 @@ import { getDefaultProvider } from "zksync";
 
 const Home: NextPage = () => {
   const address = useAddress() || "";
-  // const address = "0x439040EF89feA607475076DddeF4270C3662D315";
+
+
+
+// Define the user's wallet address and NFT ID
+const userAddress = '0x...'; // Replace with the user's wallet address
+const nftId = 123; // Replace with the ID of the NFT you're checking for
+
+// Define the contract address and token set for the NFT
+const contractAddress = '0x...'; // Replace with the address of the NFT contract on zkSync
+const tokenSet = 'ETHNFT'; // Replace with the token set for the NFT (e.g. 'ETHNFT' or 'NFT')
+
+// Initialize the provider object with the network you want to check
+const network = 'rinkeby'; // Replace with the network you want to check
+const provider = Provider.newHttpProvider(`https://${network}-api.zksync.io/jsrpc`);
+
+// Initialize the ethers provider object with the same network
+const ethersProvider = new ethers.providers.JsonRpcProvider(`https://${network}-rinkeby.infura.io/v3/<your-project-id>`);
+
+// Get the balance of the specified token set for the user's address
+provider.then(provider => {
+  provider.getState(userAddress).then(state => {
+    const tokenState = state.committed.balances[tokenSet];
+    // Check if the user owns the NFT with the specified ID
+    if (tokenState && tokenState[contractAddress] && tokenState[contractAddress][ethers.BigNumber.from(nftId).toHexString()]) {
+      // If the user owns the NFT, redirect to another page
+      window.location.href = 'https://example.com/redirect'; // Replace with the URL of the page you want to redirect to
+    }
+  }).catch(error => {
+    console.log(error);
+  });
+}).catch(error => {
+  console.log(error);
+});
+
+
+  // const address = "0xce20d01E96710885Db68ecd7cDd2423293f15130";
   // const address = `0x705306Ac819EA86e717e1e180251799EBfac95e1` || "";
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const [balance, setBalance] = useState<string>(`0`);
@@ -43,7 +78,6 @@ const Home: NextPage = () => {
   useEffect(() => {
     const getTransactionCount = async () => {
       if (address) {
-        // const provider = new providers.JsonRpcProvider("https://endpoints.omniatech.io/v1/arbitrum/one/public");
         const provider = new providers.JsonRpcProvider("https://mainnet.era.zksync.io");
         const count = await provider.getTransactionCount(address);
         setTransactionCount(count);
