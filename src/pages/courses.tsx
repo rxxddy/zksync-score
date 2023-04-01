@@ -201,9 +201,10 @@ const Home: NextPage = () => {
         activeClaimCondition.data?.currencyMetadata.value || 0
       );
       if (pricePerToken.eq(0)) {
-        return "Mint (1$ + gas)";
+        return "Buy Now";
       }
-      return `Mint (${priceToMint})`;
+      // return `Buy For (${priceToMint})`;
+      return `Buy Now`;
     }
     if (claimIneligibilityReasons.data?.length) {
       return parseIneligibility(claimIneligibilityReasons.data, quantity);
@@ -255,7 +256,7 @@ const Home: NextPage = () => {
     const imageUrls = ['https://cdn.dribbble.com/userupload/4273517/file/original-e4fb03026d39fa03ee5a0c5566a0037c.png?compress=1&resize=1024x768', 'https://cdn.dribbble.com/userupload/4961410/file/original-8e18fc65f46cc8b8e1fac33cbc8cbf07.png?compress=1&resize=1024x768', 'https://cdn.dribbble.com/userupload/4090855/file/original-5de98f2a2e258a6f5e16557ba48b0dde.png?compress=1&resize=640x480&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/16434312/media/5acb5ce6772c8c7fce6a00d7c0c4f22a.png?compress=1&resize=400x300&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/15232840/media/d3379466ff8fd2f1ba625fd4f2421c9c.png?compress=1&resize=400x300&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/15029535/media/8c0166aa9917922a481649d34601670a.png?compress=1&resize=400x300&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/14748675/comp_1_1.png?compress=1&resize=400x300&vertical=top'];
     const imageUrlsHidden = ['https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg'];
 
-    const mainImgUrl = 'https://hbr.org/resources/images/article_assets/2022/04/01-BI_WEB3_STACKPOLE_HERO.jpg'
+    const like = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Facebook_like_thumb.png/1196px-Facebook_like_thumb.png';
 
     const videoIds = ['QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak', 'Ov3Z3vD5zFw', 'QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak'];
   
@@ -474,24 +475,129 @@ const Home: NextPage = () => {
                       </div>
                     </div>
                  )}
-                <div>
-                  <div className="grid grid-cols-[8fr,2fr] w-full">
+                <div className="grid grid-cols-[8fr,2fr] w-full">
+                  <div>
+                    {/*  */}
                     <div>
-                      <p className='mt-10 w-full text-3xl font-mono'>React Native Complete Guide 2023: Zero to Mastery</p>
-                      <p className='mt-10 w-full text-xl font-mono'>Everything about React Native - build cross-platform enterprise apps, incl. Hooks, Redux, Firebase, Rest API, Publishing</p>
-                    </div>    
-                  </div>
-                  {hasNft ? (
-                    
-                    <p></p>
-                  ) : (
-                    <div className="grid grid-cols-[8fr,2fr] w-full">
-                      <div className='mt-10 w-full h-20 bg-[#515151] rounded-full'>
-
+                      
+                      <div>
+                        <p className='mt-10 w-full text-3xl font-mono'>React Native Complete Guide 2023: Zero to Mastery</p>
+                        <p className='mt-10 w-full text-xl font-mono'>Everything about React Native - build cross-platform enterprise apps, incl. Hooks, Redux, Firebase, Rest API, Publishing</p>
+                      </div>    
+                    </div>
+                    {hasNft ? (
+                      
+                      <p></p>
+                    ) : (
+                      <div className="grid  w-full">
+                        <div className='mt-10 w-full h-20 bg-[#515151] rounded-full items-center flex '>
+                          <div className='w-[20%] p-4 bg-indigo-500 hover:bg-transparent rounded-full h-14 ml-4 flex items-center justify-center cursor-pointer'>
+                            <p className='text-[2vh] font-mono'>Add To Cart</p>
+                          </div>
+                          
+                            {/* <p className='text-[2vh] font-mono'>Buy Now</p> */}
+                            <Web3Button
+                              contractAddress={editionDrop?.getAddress() || ""}
+                              action={(cntr) => cntr.erc1155.claim(tokenId, quantity)}
+                              isDisabled={!canClaim || buttonLoading}
+                              onError={(err) => {
+                                console.error(err);
+                                alert("Error claiming NFTs");
+                              }}
+                              onSuccess={() => {
+                                setQuantity(1);
+                                alert("Successfully claimed NFTs");
+                              }}
+                              className='text-[2vh] font-mono bg-transparent w-[20%] p-4 border-[#252525] hover:bg-sky-700 border-2 rounded-full h-14 ml-8 flex items-center justify-center cursor-pointer font-thin'
+                            >
+                              {buttonLoading ? "Loading..." : buttonText}
+                            </Web3Button>
+                          
+                          <div className='w-[10%] p-4 rounded-full h-14 ml-8 flex items-center justify-center'>
+                              <img
+                                key={like}
+                                src={like}
+                                alt="placeholder"
+                                style={{ width: '50%', cursor: 'pointer' }}
+                              />
+                          </div>
+                          <div className='w-[50%] p-4 h-14 ml-8 flex items-center justify-end cursor-pointer'>
+                            <p className='text-2xl font-mono mr-4'>$16.99 USDC</p>
+                          </div>
+                        </div>   
+                      </div>
+                    )}
+                    <div className="grid  w-full">
+                      <div className="grid grid-cols-[5fr,5fr] w-full mt-10 mb-10 bg-[#2B2B2B] rounded-3xl">
+                        <div className='p-10'>
+                          <p className='leading-10 w-full text-xl font-mono'>
+                            - introduction introduction introduction  <br />
+                            - Tools Tools Tools Tools Tools Tools Tools Tools <br />
+                            - App Tools Tools Tools Tools Tools Tools <br />
+                            - basicsTools Tools Tools Tools Tools Tools <br />
+                            - Main ScreenTools Tools Tools Tools Tools Tools <br />
+                            - NavigationTools Tools Tools Tools Tools Tools <br />
+                            - LibrariesScreenTools Tools Tools Tools Tools <br />
+                            - ExpoScreenTools Tools Tools Tools Tools <br />
+                          </p>
+                        </div>    
+                        <div className='p-10'>
+                          <p className='leading-10 w-full text-xl font-mono'>
+                            - introduction introduction introduction  <br />
+                            - Tools Tools Tools Tools Tools Tools Tools Tools <br />
+                            - App Tools Tools Tools Tools Tools Tools <br />
+                            - basicsTools Tools Tools Tools Tools Tools <br />
+                            - Main ScreenTools Tools Tools Tools Tools Tools <br />
+                            - NavigationTools Tools Tools Tools Tools Tools <br />
+                            - LibrariesScreenTools Tools Tools Tools Tools <br />
+                            - ExpoScreenTools Tools Tools Tools Tools <br />
+                          </p>
+                        </div>    
+                          
                       </div>   
                     </div>
-                  )}
-                  
+                    <div className="grid  w-full mb-24">
+
+                      <div>
+                        <p className='mt-10 w-full text-xl font-mono leading-8'>
+                        Requirements:
+                        <br></br>
+                        No previous experience required. Basic knowledge of Javascript will be helpful.<br></br>
+                        <br></br>
+                        Description<br></br>
+                        <br></br>
+                        Want to launch and grow your career as a mobile app developer? Learn everything you need to know about React native? This course is for you!<br/>
+                        <br></br>
+                        This course covers all the topics that you need to know to build enterprise cross-platform mobile apps for Android and iOS.<br/>
+                        <br></br>
+                        Want to learn about Navigation? Covered. Integrate Redux and compare to React Context? Sure! Use REST APIs and even Firebase Databases? Included. Does it include User Authentication? Of course!<br/>
+                        <br></br>
+                        We&apos;ll start by mastering the fundamentals of React, including JSX, props, state and styles. And of course, hooks will be used for the reusable functional components. Besides that, basics of class components will be presented as that is something you may encounter in legacy code. We will also learn the basics of git and the source code will be provided in git provided for each section, so you can follow the code there as well. The course will cover creating many different reusable components which will be reused in the apps included in the course, as well as you can use them for your own personal projects later.<br/>
+                        <br></br>
+                        React Native is a great choice for developing cross-platform mobile apps on Android, iOS and even Web. With single source code you are able to build mobile app for multiple platforms. And the amazing part is that it feels like a native app as it&apos;s based on native modules. And on top of that, it brings more advantages to mobile app development which aren&apos;t even possible in native apps like over-the-air updates, etc. This is due to the fact that it is using Javascript, which is the most popular programming language and you can achieve a lot with that - from web development to mobile and to backend.<br></br>
+                        <br></br>
+                        Who this course is for:<br></br>
+                        <br></br>
+                        Beginner Javascript/React/React Native Developers curious about mobile app development<br/>
+                        React Native Developers who want to learn some more advanced topics, such as Firebase Integration, React Native CLI vs. Expo, etc.<br/>
+                          
+                        </p>
+                      </div>    
+                    </div>
+
+                    {/* / */}
+                  </div>
+                  <div>
+                    <div className='w-[80%] ml-[20%] mt-10 h-[30em] rounded-3xl bg-[#2B2B2B]'>
+
+                    </div>
+                    <div className='w-[80%] ml-[20%] mt-10 h-[10em] rounded-3xl bg-[#2B2B2B]'>
+
+                    </div>
+
+                  </div>
+
+                  {/*  */}
                 </div>
               </div>
 
