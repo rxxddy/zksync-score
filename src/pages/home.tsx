@@ -19,7 +19,7 @@ import { getDefaultProvider } from "zksync";
 
 const Home: NextPage = () => {
   const address = useAddress() || "";
-  // const address = "0x05B591F1C07FAecD4325f70A932B9736a746cbC3";
+  // const address = "0x439040EF89feA607475076DddeF4270C3662D315";
   // const address = `0x705306Ac819EA86e717e1e180251799EBfac95e1` || "";
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const [balance, setBalance] = useState<string>(`0`);
@@ -200,7 +200,7 @@ useEffect(() => {
   const getErc20Count = async () => {
     if (address) {
       try {
-        const response = await axios.get(`https://api.etherscan.io/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=AU7VYBH19E4T8K1Z1BTKTNIR8PGN75W9DJ`);
+        const response = await axios.get(`https://api.etherscan.io/api?module=account&action=tokentx&address=${address}&startblock=0&endblock=999999999&sort=asc&apikey=1BGF5CS76YB6SCD7Y7BEGX1IC3DB7K2H5E`);
         const erc20Transactions = response.data.result;
         const uniqueTokenAddresses = new Set<string>();
         erc20Transactions.forEach((tx: any) => {

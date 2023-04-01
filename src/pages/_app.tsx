@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app'
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 import Head from "next/head";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Courses from "./courses"
+import Home from "./home"
 // This is the chainId your dApp will work on.
 const activeChain = "mumbai";
 
@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     
     <ThirdwebProvider activeChain={activeChain}>
       <Head>
-        <title>Web 3 Courses</title>
+        <title>thirdweb Edition Drop Minting Customizable Page</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
