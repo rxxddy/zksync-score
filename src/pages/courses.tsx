@@ -257,6 +257,7 @@ const Home: NextPage = () => {
     const imageUrlsHidden = ['https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg'];
 
     const like = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Facebook_like_thumb.png/1196px-Facebook_like_thumb.png';
+    const banner = 'https://hbr.org/resources/images/article_assets/2022/04/01-BI_WEB3_STACKPOLE_HERO.jpg';
 
     const videoIds = ['QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak', 'Ov3Z3vD5zFw', 'QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak'];
   
@@ -556,6 +557,12 @@ const Home: NextPage = () => {
                           
                       </div>   
                     </div>
+                    <img
+                      key={banner}
+                      src={banner}
+                      alt="placeholder"
+                      style={{ width: '100%', borderRadius: "5em" }}
+                    />
                     <div className="grid  w-full mb-24">
 
                       <div>
@@ -585,15 +592,35 @@ const Home: NextPage = () => {
                       </div>    
                     </div>
 
-                    {/* / */}
+                    {/* /  */}
                   </div>
                   <div>
-                    <div className='w-[80%] ml-[20%] mt-10 h-[30em] rounded-3xl bg-[#2B2B2B]'>
-
+                    <div className='w-[80%] ml-[20%] mt-10 rounded-3xl bg-[#2B2B2B]'>
+                          <p className='p-5 w-full text-[1.2vh] font-mono leading-8'>
+                          This course includes:<br></br>
+                          <br></br>
+                          - 15 hours on-demand video<br/>
+                          - 2 downloadable resources<br/>
+                          - Full lifetime access<br/>
+                          - Access on mobile and TV<br/>
+                          - Certificate of completion<br/>
+                          </p>
                     </div>
-                    <div className='w-[80%] ml-[20%] mt-10 h-[10em] rounded-3xl bg-[#2B2B2B]'>
-
+                    <div className='w-[80%] ml-[20%] mt-10 rounded-3xl bg-[#2B2B2B]'>
+                          <p className='p-5 w-full text-[1.2vh] font-mono leading-8'>
+                          What you&apos;ll learn:<br></br>
+                          <br></br>
+                          - Learn the Javascript and React Native basics for mobile app development on Android & iOS<br/>
+                          - Learn to build both bare React Native and Expo apps, and reveal the differences between React Native CLI & Expo<br/>
+                          - Learn using React Hooks & React Context (useState, useEffect, useContext, useSelector, useDispatch, etc.)<br/>
+                          - Integrate Native Libraries, such as Maps, Social share, Firebase<br/>
+                          - Learn how to handle REST APIs integration and find out about open source APIs<br/>
+                          - Use different navigators of React Navigation, such as Stack, Tabs and Drawer navigators<br/>
+                          - Integrate Firebase in your app and learn about serverless apps<br/>
+                          - Handle Redux integration for global state management and API Calls<br/>
+                          </p>
                     </div>
+                    
 
                   </div>
 
