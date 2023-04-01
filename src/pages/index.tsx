@@ -222,7 +222,7 @@ const Home: NextPage = () => {
   //   window.location.href = '/home';
   // }
   function handleButtonClick2() {
-    window.location.href = '/';
+    window.location.href = '/courses';
   }
   function zksyncTwitter() {
     window.location.href = 'https://twitter.com/zksync';
@@ -257,11 +257,10 @@ const Home: NextPage = () => {
                   <Image
                     src="/logo.png"
                     alt="thirdweb Logo"
-                    width={60}
+                    width={70}
                     height={60}
                     
                   />
-                  <h1 className='text-[3vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
               </button>
               
               <nav className="contents font-semibold text-base lg:text-lg">
@@ -283,7 +282,7 @@ const Home: NextPage = () => {
                     </button>
                   </li>
                   <li>
-                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
+                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Courses</button>
                   </li>
                 </ul>
                 {isMobileMenuOpen && (
@@ -301,7 +300,7 @@ const Home: NextPage = () => {
                     </li>
                     <li>
                       <button onClick={handleButtonClick2} className="block w-full py-3 text-center text-[#000000]">
-                        Mint
+                        Courses
                       </button>
                     </li>
                     <li>
@@ -325,126 +324,14 @@ const Home: NextPage = () => {
           </div>
       </nav>
 
-      <div className={styles.container}>
-        <div className={styles.mintInfoContainer}>
-          {isLoading ? (
-            <p>Loading...</p>
-          ) : (
-            <>
-              <div className={styles.infoSide}>
-                <h1 className='text-[4vh] w-full'>ZkSync Score NFT</h1><br/>
-                <h2 className='text-[2vh] mt-5 sm:mt-1 '>Check your activity score on ZkSync and mint NFT</h2><br/>
-                <h2 className='text-[2vh] mt-5 sm:mt-1 '>Mint 1$ + gas</h2><br/>
-                <div>
-                  <button onClick={zksyncBridge} className="inline sm:w-8">
-                    <Image src="/insta.png" alt="thirdweb Logo" width= {40} height={40} />
-                  </button>
-                  <button onClick={zksyncTwitter} className="inline sm:w-8">
-                    <Image src="/twitter.png" alt="thirdweb Logo" width= {40} height={40} />
-                  </button>
-                  <button onClick={zksyncWebsite} className="ml-2 inline sm:w-8">
-                    <Image src="/logo.png" alt="thirdweb Logo" width= {40} height={40}/>
-                  </button>
-                  </div>
-              </div>
+      <div className='w-9/12 m-auto'>
+        <div className="grid grid-cols-4 gap-4">
+          <div className='bg-black h-[20em] w-56 rounded-3xl'>01</div>
+          <div className='bg-white h-[20em] w-56 rounded-3xl'>02</div>
+          <div className='bg-black h-[20em] w-56 rounded-3xl'>03</div>
+          <div className='bg-white h-[20em] w-56 rounded-3xl'>04</div>
 
-              <div className={styles.imageSide}>
-                {/* Image Preview of NFTs */}
-                <img
-                  className={styles.image}
-                  src={contractMetadata?.image}
-                  alt={`${contractMetadata?.name} preview image`}
-
-                />
-
-                {/* Amount claimed so far */}
-                <div className={styles.mintCompletionArea}>
-                  <div className={styles.mintAreaLeft}>
-                    <p>Total Minted</p>
-                  </div>
-                  <div className={styles.mintAreaRight}>
-                    {claimedSupply ? (
-                      <p>
-                        <b>{numberClaimed}</b>
-                        {" / "}
-                        {numberTotal || "∞"}
-                      </p>
-                    ) : (
-                      // Show loading state if we're still loading the supply
-                      <p>Loading...</p>
-                    )}
-                  </div>
-                </div>
-
-                {claimConditions.data?.length === 0 ||
-                claimConditions.data?.every(
-                  (cc) => cc.maxClaimableSupply === "0"
-                ) ? (
-                  <div>
-                    <h2>
-                      This drop is not ready to be minted yet. (No claim condition
-                      set)
-                    </h2>
-                  </div>
-                ) : (
-                  <>
-                    {/* <p className='flex justify-center'>Quantity</p>
-                    <div className={styles.quantityContainer}>
-                      <button
-                        className={`${styles.quantityControlButton}`}
-                        onClick={() => setQuantity(quantity - 1)}
-                        disabled={quantity <= 1}
-                      >
-                        -
-                      </button>
-
-                      <h4>{quantity}</h4>
-
-                      <button
-                        className={`${styles.quantityControlButton}`}
-                        onClick={() => setQuantity(quantity + 1)}
-                        disabled={quantity >= maxClaimable}
-                      >
-                        +
-                      </button>
-                    </div> */}
-
-                    <div className={styles.mintContainer}>
-                      {isSoldOut ? (
-                        <div>
-                          <h2>Sold Out</h2>
-                        </div>
-                      ) : (
-                        <Web3Button
-                          contractAddress={editionDrop?.getAddress() || ""}
-                          action={(cntr) => cntr.erc1155.claim(tokenId, quantity)}
-                          isDisabled={!canClaim || buttonLoading}
-                          onError={(err) => {
-                            console.error(err);
-                            alert("Error claiming NFTs");
-                          }}
-                          onSuccess={() => {
-                            setQuantity(1);
-                            alert("Successfully claimed NFTs");
-                          }}
-                        >
-                          {buttonLoading ? "Loading..." : buttonText}
-                        </Web3Button>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
-          )}
         </div>
-        {/* Powered by thirdweb */}{" "}
-        {/* <img
-          src="/logo.png"
-          alt="thirdweb Logo"
-          width={135}
-          className={styles.buttonGapTop}
-        /> */}
       </div>
     </div>
   );

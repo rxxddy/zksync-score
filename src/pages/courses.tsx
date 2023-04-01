@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 // import { Inter } from 'next/font/google'
 import styles from '@/styles/Theme.module.css'
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
 import { ConnectWallet } from "@thirdweb-dev/react";
 import { Link } from "react-router-dom";
@@ -251,7 +251,7 @@ const Home: NextPage = () => {
 
   function handleButtonClick() {
     setIsMobileMenuOpen(false);
-    window.location.href = '/home';
+    window.location.href = '/';
   }
     const imageUrls = ['https://cdn.dribbble.com/userupload/4273517/file/original-e4fb03026d39fa03ee5a0c5566a0037c.png?compress=1&resize=1024x768', 'https://cdn.dribbble.com/userupload/4961410/file/original-8e18fc65f46cc8b8e1fac33cbc8cbf07.png?compress=1&resize=1024x768', 'https://cdn.dribbble.com/userupload/4090855/file/original-5de98f2a2e258a6f5e16557ba48b0dde.png?compress=1&resize=640x480&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/16434312/media/5acb5ce6772c8c7fce6a00d7c0c4f22a.png?compress=1&resize=400x300&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/15232840/media/d3379466ff8fd2f1ba625fd4f2421c9c.png?compress=1&resize=400x300&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/15029535/media/8c0166aa9917922a481649d34601670a.png?compress=1&resize=400x300&vertical=top', 'https://cdn.dribbble.com/users/1630608/screenshots/14748675/comp_1_1.png?compress=1&resize=400x300&vertical=top'];
     const imageUrlsHidden = ['https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg', 'https://img.freepik.com/free-vector/padlock-coloured-outline_78370-548.jpg'];
@@ -259,14 +259,36 @@ const Home: NextPage = () => {
     const like = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Facebook_like_thumb.png/1196px-Facebook_like_thumb.png';
     const banner = 'https://hbr.org/resources/images/article_assets/2022/04/01-BI_WEB3_STACKPOLE_HERO.jpg';
 
-    const videoIds = ['QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak', 'Ov3Z3vD5zFw', 'QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak'];
-  
+    // const videoIds = ['QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak', 'Ov3Z3vD5zFw', 'QMUii9fSKfQ', 'Ov3Z3vD5zFw', '1LkOa7Ky2ak'];
+    const videoIds = ['/hq720.mp4', `/erg.mp4`, `/render.mp4`, '/hq720.mp4', `/erg.mp4`, `/render.mp4`, '/hq720.mp4' ];
+
+    
+    // const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    
+    // const handleImageClick = (index: number) => {
+    //   setSelectedImageIndex(index);
+    // };
+    
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [videoKey, setVideoKey] = useState(0);
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     const handleImageClick = (index: number) => {
       setSelectedImageIndex(index);
+      setVideoKey(prevKey => prevKey + 1);
     };
 
+    const handleBackwardScroll = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime -= 10;
+      }
+    };
+    
+    const handleForwardScroll = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime += 10;
+      }
+    };
 
     const nftContractAddress = '0xaA9227cb66Cdb0c1602f43E4d1bc1892f8704707';
     const nftId = 0;
@@ -292,32 +314,6 @@ const Home: NextPage = () => {
   
       checkNftBalance();
     }, [address]);
-
-    // console.log(address)
-
-
-    // const [hasNFT, setHasNFT] = useState<boolean>(false);
-    // const [CheckBalance, setCheckBalance] = useState<number>(0);
-
-    // const checkNFT = async () => {
-    //   try {
-    //     const provider = new ethers.providers.JsonRpcProvider('https://endpoints.omniatech.io/v1/matic/mumbai/public');
-    //     const contractAddress = '0xaA9227cb66Cdb0c1602f43E4d1bc1892f8704707';
-    //     const contractABI = [
-    //       'function balanceOf(address, uint256) view returns (uint256)'
-    //     ]
-    //     const contract = new ethers.Contract(contractAddress, contractABI, provider);
-    //     const userAddress = address; // Replace with the user's Ethereum address
-    //     const balance = await contract.balanceOf(userAddress);
-    //     setHasNFT(balance > 0);
-    //     setCheckBalance(balance)
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // };
-    // const balanceCheck = () => {
-    //   console.log(CheckBalance)
-    // };
 
 
   return (
@@ -408,14 +404,16 @@ const Home: NextPage = () => {
 
                  {hasNft ? (
                    <div className="grid grid-cols-[8fr,2fr] w-full">
-                      <div className="bg-gray-100 h-[50em] w-full">
-                        {selectedImageIndex !== null && (
-                          <ReactPlayer
-                            url={`https://www.youtube.com/watch?v=${videoIds[selectedImageIndex]}`}
-                            width='100%'
-                            height='100%'
-                          />
-                        )}
+                      <div className=" h-auto w-full">
+                      {selectedImageIndex !== null && (
+                        <video controls width='100%' height='100%' key={videoKey} ref={videoRef} onContextMenu={(e) => e.preventDefault()} controlsList="nodownload">
+                          <source src={videoIds[selectedImageIndex]} type="video/mp4" />
+                        </video>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                        <button onClick={handleBackwardScroll} className='m-3 p-2 w-[3em] h-[3em] bg-slate-300 rounded-xl text-[#252525] font-mono'>-10s</button>
+                        <button onClick={handleForwardScroll} className='m-3 p-2 w-[3em] h-[3em] bg-slate-300 rounded-xl text-[#252525] font-mono'>10s+</button>
+                      </div>
                       </div>
       
                       <div className="bg-transparent h-[50em] w-full">
@@ -623,6 +621,9 @@ const Home: NextPage = () => {
                     
 
                   </div>
+                  {/* <video controls>
+                    <source src="/hq720.mp4" type="video/mp4" />
+                  </video> */}
 
                   {/*  */}
                 </div>
