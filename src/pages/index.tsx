@@ -34,195 +34,9 @@ const tokenId = 0;
 
 const Home: NextPage = () => {
   const address = useAddress();
-  const [quantity, setQuantity] = useState(1);
-  const { contract: editionDrop } = useContract(myEditionDropContractAddress);
-  const { data: contractMetadata } = useContractMetadata(editionDrop);
 
-  const claimConditions = useClaimConditions(editionDrop);
-  const activeClaimCondition = useActiveClaimConditionForWallet(
-    editionDrop,
-    address,
-    tokenId
-  );
-  const claimerProofs = useClaimerProofs(editionDrop, address || "", tokenId);
-  const claimIneligibilityReasons = useClaimIneligibilityReasons(
-    editionDrop,
-    {
-      quantity,
-      walletAddress: address || "",
-    },
-    tokenId
-  );
-
-  const claimedSupply = useTotalCirculatingSupply(editionDrop, tokenId);
-
-  const totalAvailableSupply = useMemo(() => {
-    try {
-      return BigNumber.from(activeClaimCondition.data?.availableSupply || 0);
-    } catch {
-      return BigNumber.from(1_000_000);
-    }
-  }, [activeClaimCondition.data?.availableSupply]);
-
-  const numberClaimed = useMemo(() => {
-    return BigNumber.from(claimedSupply.data || 0).toString();
-  }, [claimedSupply]);
-
-  const numberTotal = useMemo(() => {
-    const n = totalAvailableSupply.add(BigNumber.from(claimedSupply.data || 0));
-    if (n.gte(1_000_000)) {
-      return "";
-    }
-    return n.toString();
-  }, [totalAvailableSupply, claimedSupply]);
-
-  const priceToMint = useMemo(() => {
-    const bnPrice = BigNumber.from(
-      activeClaimCondition.data?.currencyMetadata.value || 0
-    );
-    return `${utils.formatUnits(
-      bnPrice.mul(quantity).toString(),
-      activeClaimCondition.data?.currencyMetadata.decimals || 18
-    )} ${activeClaimCondition.data?.currencyMetadata.symbol}`;
-  }, [
-    activeClaimCondition.data?.currencyMetadata.decimals,
-    activeClaimCondition.data?.currencyMetadata.symbol,
-    activeClaimCondition.data?.currencyMetadata.value,
-    quantity,
-  ]);
-
-  const maxClaimable = useMemo(() => {
-    let bnMaxClaimable;
-    try {
-      bnMaxClaimable = BigNumber.from(
-        activeClaimCondition.data?.maxClaimableSupply || 0
-      );
-    } catch (e) {
-      bnMaxClaimable = BigNumber.from(1_000_000);
-    }
-
-    let perTransactionClaimable;
-    try {
-      perTransactionClaimable = BigNumber.from(
-        activeClaimCondition.data?.maxClaimablePerWallet || 0
-      );
-    } catch (e) {
-      perTransactionClaimable = BigNumber.from(1_000_000);
-    }
-
-    if (perTransactionClaimable.lte(bnMaxClaimable)) {
-      bnMaxClaimable = perTransactionClaimable;
-    }
-
-    const snapshotClaimable = claimerProofs.data?.maxClaimable;
-
-    if (snapshotClaimable) {
-      if (snapshotClaimable === "0") {
-        // allowed unlimited for the snapshot
-        bnMaxClaimable = BigNumber.from(1_000_000);
-      } else {
-        try {
-          bnMaxClaimable = BigNumber.from(snapshotClaimable);
-        } catch (e) {
-          // fall back to default case
-        }
-      }
-    }
-
-    let max;
-    if (totalAvailableSupply.lt(bnMaxClaimable)) {
-      max = totalAvailableSupply;
-    } else {
-      max = bnMaxClaimable;
-    }
-
-    if (max.gte(1_000_000)) {
-      return 1_000_000;
-    }
-    return max.toNumber();
-  }, [
-    claimerProofs.data?.maxClaimable,
-    totalAvailableSupply,
-    activeClaimCondition.data?.maxClaimableSupply,
-    activeClaimCondition.data?.maxClaimablePerWallet,
-  ]);
-
-  const isSoldOut = useMemo(() => {
-    try {
-      return (
-        (activeClaimCondition.isSuccess &&
-          BigNumber.from(activeClaimCondition.data?.availableSupply || 0).lte(
-            0
-          )) ||
-        numberClaimed === numberTotal
-      );
-    } catch (e) {
-      return false;
-    }
-  }, [
-    activeClaimCondition.data?.availableSupply,
-    activeClaimCondition.isSuccess,
-    numberClaimed,
-    numberTotal,
-  ]);
-
-  const canClaim = useMemo(() => {
-    return (
-      activeClaimCondition.isSuccess &&
-      claimIneligibilityReasons.isSuccess &&
-      claimIneligibilityReasons.data?.length === 0
-    );
-  }, [activeClaimCondition.isSuccess, claimIneligibilityReasons.isSuccess, claimIneligibilityReasons.data?.length]);
-
-  const isLoading = useMemo(() => {
-    return (
-      activeClaimCondition.isLoading || claimedSupply.isLoading || !editionDrop
-    );
-  }, [activeClaimCondition.isLoading, editionDrop, claimedSupply.isLoading]);
-
-  const buttonLoading = useMemo(
-    () => isLoading || claimIneligibilityReasons.isLoading,
-    [claimIneligibilityReasons.isLoading, isLoading]
-  );
-  const buttonText = useMemo(() => {
-    if (isSoldOut) {
-      return "Sold Out";
-    }
-
-    if (canClaim) {
-      const pricePerToken = BigNumber.from(
-        activeClaimCondition.data?.currencyMetadata.value || 0
-      );
-      if (pricePerToken.eq(0)) {
-        return "Mint (1$ + gas)";
-      }
-      return `Mint (${priceToMint})`;
-    }
-    if (claimIneligibilityReasons.data?.length) {
-      return parseIneligibility(claimIneligibilityReasons.data, quantity);
-    }
-    if (buttonLoading) {
-      return "Checking eligibility...";
-    }
-
-    return "Claiming not available";
-  }, [
-    isSoldOut,
-    canClaim,
-    claimIneligibilityReasons.data,
-    buttonLoading,
-    activeClaimCondition.data?.currencyMetadata.value,
-    priceToMint,
-    quantity,
-  ]);
-
-
-
-  // function handleButtonClick() {
-  //   window.location.href = '/home';
-  // }
   function handleButtonClick2() {
-    window.location.href = '/';
+    window.location.href = '/courses';
   }
   function zksyncTwitter() {
     window.location.href = 'https://twitter.com/zksync';
@@ -245,6 +59,15 @@ const Home: NextPage = () => {
     window.location.href = '/home';
   }
 
+  function redirectToCoursesPage(imageNumber: number) {
+    if (imageNumber === 1) {
+      window.location.href = '/courses';
+    } else if (imageNumber === 2) {
+      window.location.href = '/page2';
+    } else if (imageNumber === 3) {
+      window.location.href = '/page3';
+    }
+  }
   
 
   return (
@@ -257,11 +80,10 @@ const Home: NextPage = () => {
                   <Image
                     src="/logo.png"
                     alt="thirdweb Logo"
-                    width={60}
+                    width={70}
                     height={60}
                     
                   />
-                  <h1 className='text-[3vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
               </button>
               
               <nav className="contents font-semibold text-base lg:text-lg">
@@ -283,7 +105,7 @@ const Home: NextPage = () => {
                     </button>
                   </li>
                   <li>
-                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
+                    <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Courses</button>
                   </li>
                 </ul>
                 {isMobileMenuOpen && (
@@ -301,12 +123,12 @@ const Home: NextPage = () => {
                     </li>
                     <li>
                       <button onClick={handleButtonClick2} className="block w-full py-3 text-center text-[#000000]">
-                        Mint
+                        Courses
                       </button>
                     </li>
                     <li>
                       <ConnectWallet
-                        accentColor="#a9a9a9"
+                        accentColor="#252525"
                         colorMode="dark"
                         btnTitle="Connect Wallet"
                       />
@@ -315,7 +137,7 @@ const Home: NextPage = () => {
                 )}
                 <div className="hidden md:block">
                   <ConnectWallet
-                    accentColor="black"
+                    accentColor="#252525"
                     colorMode="light"
                     btnTitle="Connect Wallet"
                   />
@@ -324,127 +146,168 @@ const Home: NextPage = () => {
               
           </div>
       </nav>
-
-      <div className={styles.container}>
-        <div className={styles.mintInfoContainer}>
-          {isLoading ? (
-            <p>Loading...</p>
-          ) : (
-            <>
-              <div className={styles.infoSide}>
-                <h1 className='text-[4vh] w-full'>ZkSync Score NFT</h1><br/>
-                <h2 className='text-[2vh] mt-5 sm:mt-1 '>Check your activity score on ZkSync and mint NFT</h2><br/>
-                <h2 className='text-[2vh] mt-5 sm:mt-1 '>Mint 1$ + gas</h2><br/>
-                <div>
-                  <button onClick={zksyncBridge} className="inline sm:w-8">
-                    <Image src="/insta.png" alt="thirdweb Logo" width= {40} height={40} />
-                  </button>
-                  <button onClick={zksyncTwitter} className="inline sm:w-8">
-                    <Image src="/twitter.png" alt="thirdweb Logo" width= {40} height={40} />
-                  </button>
-                  <button onClick={zksyncWebsite} className="ml-2 inline sm:w-8">
-                    <Image src="/logo.png" alt="thirdweb Logo" width= {40} height={40}/>
-                  </button>
-                  </div>
-              </div>
-
-              <div className={styles.imageSide}>
-                {/* Image Preview of NFTs */}
-                <img
-                  className={styles.image}
-                  src={contractMetadata?.image}
-                  alt={`${contractMetadata?.name} preview image`}
-
-                />
-
-                {/* Amount claimed so far */}
-                <div className={styles.mintCompletionArea}>
-                  <div className={styles.mintAreaLeft}>
-                    <p>Total Minted</p>
-                  </div>
-                  <div className={styles.mintAreaRight}>
-                    {claimedSupply ? (
-                      <p>
-                        <b>{numberClaimed}</b>
-                        {" / "}
-                        {numberTotal || "∞"}
-                      </p>
-                    ) : (
-                      // Show loading state if we're still loading the supply
-                      <p>Loading...</p>
-                    )}
-                  </div>
-                </div>
-
-                {claimConditions.data?.length === 0 ||
-                claimConditions.data?.every(
-                  (cc) => cc.maxClaimableSupply === "0"
-                ) ? (
-                  <div>
-                    <h2>
-                      This drop is not ready to be minted yet. (No claim condition
-                      set)
-                    </h2>
-                  </div>
-                ) : (
-                  <>
-                    {/* <p className='flex justify-center'>Quantity</p>
-                    <div className={styles.quantityContainer}>
-                      <button
-                        className={`${styles.quantityControlButton}`}
-                        onClick={() => setQuantity(quantity - 1)}
-                        disabled={quantity <= 1}
-                      >
-                        -
-                      </button>
-
-                      <h4>{quantity}</h4>
-
-                      <button
-                        className={`${styles.quantityControlButton}`}
-                        onClick={() => setQuantity(quantity + 1)}
-                        disabled={quantity >= maxClaimable}
-                      >
-                        +
-                      </button>
-                    </div> */}
-
-                    <div className={styles.mintContainer}>
-                      {isSoldOut ? (
-                        <div>
-                          <h2>Sold Out</h2>
-                        </div>
-                      ) : (
-                        <Web3Button
-                          contractAddress={editionDrop?.getAddress() || ""}
-                          action={(cntr) => cntr.erc1155.claim(tokenId, quantity)}
-                          isDisabled={!canClaim || buttonLoading}
-                          onError={(err) => {
-                            console.error(err);
-                            alert("Error claiming NFTs");
-                          }}
-                          onSuccess={() => {
-                            setQuantity(1);
-                            alert("Successfully claimed NFTs");
-                          }}
-                        >
-                          {buttonLoading ? "Loading..." : buttonText}
-                        </Web3Button>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
-          )}
+      <div className='w-[80%] h-[60em] m-auto items-center flex'>
+        <div className='w-[35em] h-60 items-center ml-20 '>
+            <p className='font-mono text-xl'>First Web3 online courses platform</p><br></br>
+            <br></br>
+            <p className='font-mono text-[2.5em]'>Bringing Web3 To Learning</p><br></br>
+            <br></br>
+            <p className='font-mono text-xl'>Skills for your present (and your future). Get started with us.</p>
         </div>
-        {/* Powered by thirdweb */}{" "}
-        {/* <img
-          src="/logo.png"
-          alt="thirdweb Logo"
-          width={135}
-          className={styles.buttonGapTop}
-        /> */}
+      </div>
+      <div className='w-full'>
+        <div className='w-[65%] m-auto items-center flex '>
+          <p className='font-mono text-[1.6em]'>Trending Courses:</p><br></br>
+        </div>
+      </div>
+      <div className='w-[65%] h-[30em] m-auto items-center flex bg-[#252525] border-2 border-[grey] hover:bg-[#171717] cursor-pointer' onClick={() => redirectToCoursesPage(1)}>
+        <img
+          key={'https://external-preview.redd.it/1GIbkRiU0HE6PVtBxBNa7mD2EpA_7rA9ZjDAQDpPsfU.jpg?width=640&crop=smart&auto=webp&s=a49ffb84576197ab0692feaf58e84e389d140f76'}
+          src={'https://external-preview.redd.it/1GIbkRiU0HE6PVtBxBNa7mD2EpA_7rA9ZjDAQDpPsfU.jpg?width=640&crop=smart&auto=webp&s=a49ffb84576197ab0692feaf58e84e389d140f76'}
+          alt="placeholder"
+          className='h-[20em] rounded-xl ml-20'
+        />   
+        <div>
+          <p className='leading-10 w-full text-3xl font-mono ml-20'>
+            React Native Complete Guide 2023: Zero to Mastery
+          </p>
+          <p className=' w-full text-base font-mono ml-20 leading-6 mt-6'>
+          Everything about React Native - build cross-platform enterprise apps, incl. Hooks,<br /> Redux, Firebase, Rest API, Publishing <br />
+          Tools Tools Tools Tools Tools Tools Tools Tools <br />
+          </p>
+          <p className='leading-10 w-full text-xs font-mono ml-20'>
+          By Dave De Cooper
+          </p>
+          <p className='leading-10 w-full text-3xl font-mono ml-20 mt-32'>
+          $16.99
+          </p>
+        </div>
+      </div>
+      <div className='w-6/12 m-auto'>
+        <div className="grid grid-cols-4 gap-4">
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer' onClick={() => redirectToCoursesPage(1)}>
+            <img
+              key={'https://external-preview.redd.it/1GIbkRiU0HE6PVtBxBNa7mD2EpA_7rA9ZjDAQDpPsfU.jpg?width=640&crop=smart&auto=webp&s=a49ffb84576197ab0692feaf58e84e389d140f76'}
+              src={'https://external-preview.redd.it/1GIbkRiU0HE6PVtBxBNa7mD2EpA_7rA9ZjDAQDpPsfU.jpg?width=640&crop=smart&auto=webp&s=a49ffb84576197ab0692feaf58e84e389d140f76'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>React Native Complete Guide 2023</p>
+            <p className='font-mono text-md '>$16.99</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer' onClick={() => redirectToCoursesPage(2)}>
+            <img
+              key={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              src={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>Web3 Programming With Moralis</p>
+            <p className='font-mono text-md '>$6.12</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer' onClick={() => redirectToCoursesPage(3)}>
+            <img
+              key={'https://miro.medium.com/v2/resize:fit:1080/1*NU0vBKtpCt9hfkVImj7keQ@2x.jpeg'}
+              src={'https://miro.medium.com/v2/resize:fit:1080/1*NU0vBKtpCt9hfkVImj7keQ@2x.jpeg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>Fullstack blockchain Developer</p>
+            <p className='font-mono text-md '>$99.99</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://thumbs.dreamstime.com/b/c-programming-code-abstract-technology-background-computer-software-coding-d-c-programming-code-abstract-technology-background-219889203.jpg'}
+              src={'https://thumbs.dreamstime.com/b/c-programming-code-abstract-technology-background-computer-software-coding-d-c-programming-code-abstract-technology-background-219889203.jpg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>C++ Fullsatck Dev</p>
+            <p className='font-mono text-md '>$47.99</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              src={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>Web3 Programming With Moralis</p>
+            <p className='font-mono text-md '>$6.12</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://miro.medium.com/v2/resize:fit:1080/1*NU0vBKtpCt9hfkVImj7keQ@2x.jpeg'}
+              src={'https://miro.medium.com/v2/resize:fit:1080/1*NU0vBKtpCt9hfkVImj7keQ@2x.jpeg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>Fullstack blockchain Developer</p>
+            <p className='font-mono text-md '>$99.99</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://thumbs.dreamstime.com/b/c-programming-code-abstract-technology-background-computer-software-coding-d-c-programming-code-abstract-technology-background-219889203.jpg'}
+              src={'https://thumbs.dreamstime.com/b/c-programming-code-abstract-technology-background-computer-software-coding-d-c-programming-code-abstract-technology-background-219889203.jpg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>C++ Fullsatck Dev</p>
+            <p className='font-mono text-md '>$47.99</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              src={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>Web3 Programming With Moralis</p>
+            <p className='font-mono text-md '>$6.12</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://thumbs.dreamstime.com/b/c-programming-code-abstract-technology-background-computer-software-coding-d-c-programming-code-abstract-technology-background-219889203.jpg'}
+              src={'https://thumbs.dreamstime.com/b/c-programming-code-abstract-technology-background-computer-software-coding-d-c-programming-code-abstract-technology-background-219889203.jpg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>C++ Fullsatck Dev</p>
+            <p className='font-mono text-md '>$47.99</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://external-preview.redd.it/1GIbkRiU0HE6PVtBxBNa7mD2EpA_7rA9ZjDAQDpPsfU.jpg?width=640&crop=smart&auto=webp&s=a49ffb84576197ab0692feaf58e84e389d140f76'}
+              src={'https://external-preview.redd.it/1GIbkRiU0HE6PVtBxBNa7mD2EpA_7rA9ZjDAQDpPsfU.jpg?width=640&crop=smart&auto=webp&s=a49ffb84576197ab0692feaf58e84e389d140f76'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>React Native Complete Guide 2023</p>
+            <p className='font-mono text-md '>$16.99</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              src={'https://moralis.io/wp-content/uploads/2022/03/2022_02_How_to_Become_a_web3_developer_full_guide_V4.0.jpg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>Web3 Programming With Moralis</p>
+            <p className='font-mono text-md '>$6.12</p>
+          </div>
+          <div className=' h-[20em] w-56 rounded-xl mt-16 mb-8 cursor-pointer'>
+            <img
+              key={'https://miro.medium.com/v2/resize:fit:1080/1*NU0vBKtpCt9hfkVImj7keQ@2x.jpeg'}
+              src={'https://miro.medium.com/v2/resize:fit:1080/1*NU0vBKtpCt9hfkVImj7keQ@2x.jpeg'}
+              alt="placeholder"
+              className='h-full rounded-3xl'
+            />
+            <p className='font-mono text-md '>Fullstack blockchain Developer</p>
+            <p className='font-mono text-md '>$99.99</p>
+          </div>
+
+
+        </div>
       </div>
     </div>
   );

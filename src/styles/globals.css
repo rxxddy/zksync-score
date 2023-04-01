@@ -7,7 +7,7 @@
 /* Change the values in here to match your branding */
 :root {
   /* Background color of the page */
-  --background-color: #000000;
+  --background-color: #252525;
 /* 
   background-image: url("https://preview.redd.it/ab94i3q4agk21.jpg?auto=webp&s=7e8a12e5999c1d265b9bd05a28025e06382cc085");
   background-repeat: no-repeat;
@@ -49,4 +49,23 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  display: none;
+  /* Hide scrollbar for Firefox */
+  scrollbar-width: none;
+
+  /* Hide scrollbar for IE and Edge */
+  -ms-overflow-style: none;
+}
+
+.banner {
+  /* background-image: url('../../public/blockchain1.gif'); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 80%;
+  margin: auto;
+  height: 60em;
 }
