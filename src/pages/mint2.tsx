@@ -264,7 +264,7 @@ const Home: NextPage = () => {
 
                   <Image
                     src="/logo.png"
-                    alt="thirdweb Logo"
+                    alt="Zksync Score"
                     width={60}
                     height={60}
                     className={styles.buttonGapTop}

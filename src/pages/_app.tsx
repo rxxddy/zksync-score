@@ -12,15 +12,15 @@ function MyApp({ Component, pageProps }: AppProps) {
     
     <ThirdwebProvider activeChain={activeChain}>
       <Head>
-        <title>thirdweb Edition Drop Minting Customizable Page</title>
+        <title>ZkSync Score</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="Learn How To Use Thirdweb's Edition Drop contract and create a customizable Edition Drop minting page"
+          content="ZkSync Score"
         />
         <meta
           name="keywords"
-          content="Thirdweb, thirdweb Edition drop, how to make thirdweb nft drop, how to make nft collection thirdweb"
+          content="Thirdweb, nft, nftdrop, zksync, retrodrop, arbitrum"
         />
       </Head>
       <Component {...pageProps} />
