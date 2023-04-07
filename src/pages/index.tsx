@@ -2,10 +2,8 @@ import Head from 'next/head'
 import Image from 'next/image'
 // import { Inter } from 'next/font/google'
 import styles from '@/styles/Theme.module.css'
-
 import { ConnectWallet } from "@thirdweb-dev/react";
 import { Link } from "react-router-dom";
-
 import {
   useActiveClaimConditionForWallet,
   useAddress,
@@ -23,21 +21,16 @@ import { useMemo, useState } from "react";
 import { parseIneligibility } from "../utils/parseIneligibility";
 import Logo from "../../public/logo.png"
 import { BrowserRouter } from 'react-router-dom';
-
-
 // Put Your Edition Drop Contract address from the dashboard here
 const myEditionDropContractAddress =
   "0xaA9227cb66Cdb0c1602f43E4d1bc1892f8704707";
-
 // Put your token ID here
 const tokenId = 0;
-
 const Home: NextPage = () => {
   const address = useAddress();
   const [quantity, setQuantity] = useState(1);
   const { contract: editionDrop } = useContract(myEditionDropContractAddress);
   const { data: contractMetadata } = useContractMetadata(editionDrop);
-
   const claimConditions = useClaimConditions(editionDrop);
   const activeClaimCondition = useActiveClaimConditionForWallet(
     editionDrop,
@@ -53,9 +46,7 @@ const Home: NextPage = () => {
     },
     tokenId
   );
-
   const claimedSupply = useTotalCirculatingSupply(editionDrop, tokenId);
-
   const totalAvailableSupply = useMemo(() => {
     try {
       return BigNumber.from(activeClaimCondition.data?.availableSupply || 0);
@@ -63,11 +54,9 @@ const Home: NextPage = () => {
       return BigNumber.from(1_000_000);
     }
   }, [activeClaimCondition.data?.availableSupply]);
-
   const numberClaimed = useMemo(() => {
     return BigNumber.from(claimedSupply.data || 0).toString();
   }, [claimedSupply]);
-
   const numberTotal = useMemo(() => {
     const n = totalAvailableSupply.add(BigNumber.from(claimedSupply.data || 0));
     if (n.gte(1_000_000)) {
@@ -75,7 +64,6 @@ const Home: NextPage = () => {
     }
     return n.toString();
   }, [totalAvailableSupply, claimedSupply]);
-
   const priceToMint = useMemo(() => {
     const bnPrice = BigNumber.from(
       activeClaimCondition.data?.currencyMetadata.value || 0
@@ -90,7 +78,6 @@ const Home: NextPage = () => {
     activeClaimCondition.data?.currencyMetadata.value,
     quantity,
   ]);
-
   const maxClaimable = useMemo(() => {
     let bnMaxClaimable;
     try {
@@ -100,7 +87,6 @@ const Home: NextPage = () => {
     } catch (e) {
       bnMaxClaimable = BigNumber.from(1_000_000);
     }
-
     let perTransactionClaimable;
     try {
       perTransactionClaimable = BigNumber.from(
@@ -109,13 +95,10 @@ const Home: NextPage = () => {
     } catch (e) {
       perTransactionClaimable = BigNumber.from(1_000_000);
     }
-
     if (perTransactionClaimable.lte(bnMaxClaimable)) {
       bnMaxClaimable = perTransactionClaimable;
     }
-
     const snapshotClaimable = claimerProofs.data?.maxClaimable;
-
     if (snapshotClaimable) {
       if (snapshotClaimable === "0") {
         // allowed unlimited for the snapshot
@@ -128,14 +111,12 @@ const Home: NextPage = () => {
         }
       }
     }
-
     let max;
     if (totalAvailableSupply.lt(bnMaxClaimable)) {
       max = totalAvailableSupply;
     } else {
       max = bnMaxClaimable;
     }
-
     if (max.gte(1_000_000)) {
       return 1_000_000;
     }
@@ -146,7 +127,6 @@ const Home: NextPage = () => {
     activeClaimCondition.data?.maxClaimableSupply,
     activeClaimCondition.data?.maxClaimablePerWallet,
   ]);
-
   const isSoldOut = useMemo(() => {
     try {
       return (
@@ -165,7 +145,6 @@ const Home: NextPage = () => {
     numberClaimed,
     numberTotal,
   ]);
-
   const canClaim = useMemo(() => {
     return (
       activeClaimCondition.isSuccess &&
@@ -173,13 +152,11 @@ const Home: NextPage = () => {
       claimIneligibilityReasons.data?.length === 0
     );
   }, [activeClaimCondition.isSuccess, claimIneligibilityReasons.isSuccess, claimIneligibilityReasons.data?.length]);
-
   const isLoading = useMemo(() => {
     return (
       activeClaimCondition.isLoading || claimedSupply.isLoading || !editionDrop
     );
   }, [activeClaimCondition.isLoading, editionDrop, claimedSupply.isLoading]);
-
   const buttonLoading = useMemo(
     () => isLoading || claimIneligibilityReasons.isLoading,
     [claimIneligibilityReasons.isLoading, isLoading]
@@ -188,7 +165,6 @@ const Home: NextPage = () => {
     if (isSoldOut) {
       return "Sold Out";
     }
-
     if (canClaim) {
       const pricePerToken = BigNumber.from(
         activeClaimCondition.data?.currencyMetadata.value || 0
@@ -204,7 +180,6 @@ const Home: NextPage = () => {
     if (buttonLoading) {
       return "Checking eligibility...";
     }
-
     return "Claiming not available";
   }, [
     isSoldOut,
@@ -215,9 +190,6 @@ const Home: NextPage = () => {
     priceToMint,
     quantity,
   ]);
-
-
-
   // function handleButtonClick() {
   //   window.location.href = '/home';
   // }
@@ -233,37 +205,30 @@ const Home: NextPage = () => {
   function zksyncBridge() {
     window.location.href = 'https://portal.zksync.io/bridge';
   }
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const handleMobileMenuClick = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
   function handleButtonClick() {
     setIsMobileMenuOpen(false);
     window.location.href = '/home';
   }
-
   
-
   return (
     <div>
-
       <nav className="backdrop-blur-2xl">
           <div className=" container mx-auto flex items-center h-24 rounded-3xl justify-between">
               <button onClick={handleButtonClick} className="ml-4 flex items-center justify-center">
-
                   <Image
                     src="/logo.png"
                     alt="thirdweb Logo"
                     width={60}
                     height={60}
-                    
+
                   />
                   <h1 className='text-[3vh] ml-2 font-sans font-medium'>ZkSync Score</h1>
               </button>
-              
+
               <nav className="contents font-semibold text-base lg:text-lg">
                 <div className="flex justify-between items-center md:hidden">
                   <button
@@ -324,8 +289,6 @@ const Home: NextPage = () => {
               
           </div>
       </nav>
-
-<<<<<<< HEAD
       <div className={styles.container}>
         <div className={styles.mintInfoContainer}>
           {isLoading ? (
@@ -348,24 +311,13 @@ const Home: NextPage = () => {
                   </button>
                   </div>
               </div>
-=======
-      <div className='w-9/12 m-auto'>
-        <div className="grid grid-cols-4 gap-4">
-          <div className='bg-black h-[20em] w-56 rounded-3xl'>01</div>
-          <div className='bg-white h-[20em] w-56 rounded-3xl'>02</div>
-          <div className='bg-black h-[20em] w-56 rounded-3xl'>03</div>
-          <div className='bg-white h-[20em] w-56 rounded-3xl'>04</div>
->>>>>>> parent of 0585b81 (update 5)
-
               <div className={styles.imageSide}>
                 {/* Image Preview of NFTs */}
                 <img
                   className={styles.image}
                   src={contractMetadata?.image}
                   alt={`${contractMetadata?.name} preview image`}
-
                 />
-
                 {/* Amount claimed so far */}
                 <div className={styles.mintCompletionArea}>
                   <div className={styles.mintAreaLeft}>
@@ -384,7 +336,6 @@ const Home: NextPage = () => {
                     )}
                   </div>
                 </div>
-
                 {claimConditions.data?.length === 0 ||
                 claimConditions.data?.every(
                   (cc) => cc.maxClaimableSupply === "0"
@@ -406,9 +357,7 @@ const Home: NextPage = () => {
                       >
                         -
                       </button>
-
                       <h4>{quantity}</h4>
-
                       <button
                         className={`${styles.quantityControlButton}`}
                         onClick={() => setQuantity(quantity + 1)}
@@ -417,7 +366,6 @@ const Home: NextPage = () => {
                         +
                       </button>
                     </div> */}
-
                     <div className={styles.mintContainer}>
                       {isSoldOut ? (
                         <div>
@@ -458,5 +406,4 @@ const Home: NextPage = () => {
     </div>
   );
 };
-
 export default Home;
