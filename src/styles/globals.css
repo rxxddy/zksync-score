@@ -50,8 +50,6 @@ body {
 *::after {
   box-sizing: border-box;
 }
-<<<<<<< HEAD
-=======
 
 ::-webkit-scrollbar {
   display: none;
@@ -62,4 +60,4 @@ body {
   -ms-overflow-style: none;
 }
 
->>>>>>> parent of 0585b81 (update 5)
+
