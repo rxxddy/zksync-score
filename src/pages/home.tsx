@@ -433,9 +433,6 @@ function handleButtonClick2() {
                   <li>
                     <button onClick={handleButtonClick2} className="p-5 xl:p-8 text-[#c1c1c1] active ">Mint</button>
                   </li>
-                  <li>
-                    <button onClick={getConsoleInfo} className="p-5 xl:p-8 text-[#c1c1c1] active ">getConsoleInfo</button>
-                  </li>
                 </ul>
                 {isMobileMenuOpen && (
                   <ul
