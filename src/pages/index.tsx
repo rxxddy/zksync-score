@@ -325,7 +325,6 @@ const Home: NextPage = () => {
           </div>
       </nav>
 
-<<<<<<< HEAD
       <div className={styles.container}>
         <div className={styles.mintInfoContainer}>
           {isLoading ? (
@@ -348,14 +347,6 @@ const Home: NextPage = () => {
                   </button>
                   </div>
               </div>
-=======
-      <div className='w-9/12 m-auto'>
-        <div className="grid grid-cols-4 gap-4">
-          <div className='bg-black h-[20em] w-56 rounded-3xl'>01</div>
-          <div className='bg-white h-[20em] w-56 rounded-3xl'>02</div>
-          <div className='bg-black h-[20em] w-56 rounded-3xl'>03</div>
-          <div className='bg-white h-[20em] w-56 rounded-3xl'>04</div>
->>>>>>> parent of 0585b81 (update 5)
 
               <div className={styles.imageSide}>
                 {/* Image Preview of NFTs */}
